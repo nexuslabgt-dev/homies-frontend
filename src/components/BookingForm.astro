@@ -1,0 +1,570 @@
+---
+import { services } from '../data/site'
+import { supabase } from '../lib/supabase'
+import type { Pet } from '../lib/types'
+
+interface Props {
+  class?: string
+}
+
+const { class: className = '' } = Astro.props
+
+const serviceList = services.slice(0, 6)
+---
+
+<div class={`booking-form-container ${className}`} data-step="1">
+  <div class="form-progress mb-8">
+    <div class="flex items-center justify-between">
+      {[1, 2, 3, 4].map((n) => (
+        <div class="flex items-center" data-progress-step={n}>
+          <div class={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+            n === 1 ? 'bg-accent text-white' : 'bg-dark-200 text-gray-400'
+          }`}>
+            {n}
+          </div>
+          {n < 4 && (
+            <div class="w-12 sm:w-20 h-0.5 mx-2 bg-dark-200" data-progress-line={n}></div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <form id="booking-form" class="space-y-6">
+    <input type="hidden" name="service_id" value="" />
+    <input type="hidden" name="pet_id" value="" />
+
+    <div class="step-container">
+      <div id="step-1" class="step-content" data-step="1">
+        <h3 class="text-2xl font-bold text-white mb-2">Select a Service</h3>
+        <p class="text-gray-400 mb-6">Choose the perfect service for your pet</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {serviceList.map((service, index) => (
+            <button
+              type="button"
+              class="service-card group p-4 rounded-xl border-2 border-dark-200 bg-dark-300 hover:border-accent transition-all duration-300 text-left"
+              data-service-index={index}
+              data-service-id={index}
+            >
+              <div class="aspect-video w-full mb-3 rounded-lg overflow-hidden">
+                <img src={service.image} alt={service.name} class="w-full h-full object-cover" loading="lazy" />
+              </div>
+              <h4 class="text-lg font-semibold text-white group-hover:text-accent transition-colors">{service.name}</h4>
+              <p class="text-sm text-gray-400 mt-1 line-clamp-2">{service.description}</p>
+              <p class="text-accent font-bold mt-2">{service.price}</p>
+            </button>
+          ))}
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button type="button" id="next-step-1" class="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            Next Step
+          </button>
+        </div>
+      </div>
+
+      <div id="step-2" class="step-content hidden" data-step="2">
+        <h3 class="text-2xl font-bold text-white mb-2">Select Dates</h3>
+        <p class="text-gray-400 mb-6">Choose when you need the service</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">Start Date</label>
+            <input type="date" id="start-date" name="start_date" required class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">End Date <span class="text-gray-500">(optional for day services)</span></label>
+            <input type="date" id="end-date" name="end_date" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none" />
+          </div>
+        </div>
+        <div id="price-summary-2" class="mt-6 p-4 bg-dark-200 rounded-lg hidden">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300">Service:</span>
+            <span id="selected-service-name" class="text-white font-semibold">-</span>
+          </div>
+          <div class="flex justify-between items-center mt-2">
+            <span class="text-gray-300">Duration:</span>
+            <span id="selected-duration" class="text-white font-semibold">-</span>
+          </div>
+          <div class="flex justify-between items-center mt-4 pt-4 border-t border-dark-100">
+            <span class="text-lg font-bold text-white">Total:</span>
+            <span id="selected-total-price" class="text-xl font-bold text-accent">Q.0</span>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-between">
+          <button type="button" class="back-btn px-6 py-3 bg-dark-200 text-white rounded-lg font-semibold hover:bg-dark-100 transition-colors" data-goto="1">
+            Back
+          </button>
+          <button type="button" id="next-step-2" class="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
+            Next Step
+          </button>
+        </div>
+      </div>
+
+      <div id="step-3" class="step-content hidden" data-step="3">
+        <h3 class="text-2xl font-bold text-white mb-2">Pet Information</h3>
+        <p class="text-gray-400 mb-6">Tell us about your furry friend</p>
+        <div id="pet-selection-section">
+          <label class="block text-sm text-gray-300 mb-2">Select Pet</label>
+          <select id="pet-select" name="existing_pet" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none">
+            <option value="">-- Add New Pet --</option>
+          </select>
+        </div>
+        <div id="new-pet-section" class="mt-4 space-y-4 hidden">
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">Pet Name</label>
+            <input type="text" id="pet-name" name="pet_name" placeholder="e.g. Max" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white placeholder-gray-500 focus:border-accent focus:outline-none" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-300 mb-2">Type</label>
+              <select id="pet-type" name="pet_type" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none">
+                <option value="dog">Dog</option>
+                <option value="cat">Cat</option>
+                <option value="bird">Bird</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-300 mb-2">Size</label>
+              <select id="pet-size" name="pet_size" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none">
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="block text-sm text-gray-300 mb-2">Notes / Special Instructions</label>
+          <textarea id="pet-notes" name="notes" rows="3" placeholder="Any special needs, behavior notes, or care instructions..." class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white placeholder-gray-500 focus:border-accent focus:outline-none resize-none"></textarea>
+        </div>
+        <div class="mt-6 flex justify-between">
+          <button type="button" class="back-btn px-6 py-3 bg-dark-200 text-white rounded-lg font-semibold hover:bg-dark-100 transition-colors" data-goto="2">
+            Back
+          </button>
+          <button type="button" id="next-step-3" class="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
+            Next Step
+          </button>
+        </div>
+      </div>
+
+      <div id="step-4" class="step-content hidden" data-step="4">
+        <h3 class="text-2xl font-bold text-white mb-2">Confirm Booking</h3>
+        <p class="text-gray-400 mb-6">Review your booking details</p>
+        <div class="bg-dark-200 rounded-xl p-6 space-y-4">
+          <div class="flex items-start gap-4">
+            <img id="confirm-service-image" src="" alt="" class="w-20 h-20 object-cover rounded-lg" />
+            <div>
+              <h4 id="confirm-service-name" class="text-xl font-bold text-white">-</h4>
+              <p id="confirm-service-price" class="text-accent font-semibold">-</p>
+            </div>
+          </div>
+          <div class="border-t border-dark-100 pt-4">
+            <div class="flex justify-between">
+              <span class="text-gray-400">Start Date:</span>
+              <span id="confirm-start-date" class="text-white">-</span>
+            </div>
+            <div class="flex justify-between mt-2">
+              <span class="text-gray-400">End Date:</span>
+              <span id="confirm-end-date" class="text-white">-</span>
+            </div>
+            <div class="flex justify-between mt-2">
+              <span class="text-gray-400">Duration:</span>
+              <span id="confirm-duration" class="text-white">-</span>
+            </div>
+          </div>
+          <div class="border-t border-dark-100 pt-4">
+            <div class="flex justify-between">
+              <span class="text-gray-400">Pet:</span>
+              <span id="confirm-pet-name" class="text-white">-</span>
+            </div>
+            <div class="flex justify-between mt-2">
+              <span class="text-gray-400">Pet Type/Size:</span>
+              <span id="confirm-pet-info" class="text-white">-</span>
+            </div>
+          </div>
+          <div class="border-t border-dark-100 pt-4">
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-bold text-white">Total Price:</span>
+              <span id="confirm-total-price" class="text-2xl font-bold text-accent">Q.0</span>
+            </div>
+          </div>
+        </div>
+        <div id="error-message" class="mt-4 p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-400 hidden"></div>
+        <div class="mt-6 flex justify-between">
+          <button type="button" class="back-btn px-6 py-3 bg-dark-200 text-white rounded-lg font-semibold hover:bg-dark-100 transition-colors" data-goto="3">
+            Back
+          </button>
+          <button type="submit" id="submit-booking" class="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
+            Confirm Booking
+          </button>
+        </div>
+      </div>
+
+      <div id="step-5" class="step-content hidden" data-step="5">
+        <div class="text-center py-12">
+          <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-2">Booking Confirmed!</h3>
+          <p class="text-gray-400 mb-6">Your booking has been successfully created.</p>
+          <div class="bg-dark-200 rounded-xl p-6 inline-block">
+            <p class="text-sm text-gray-400 mb-1">Booking Reference</p>
+            <p id="booking-reference" class="text-xl font-bold text-accent">-</p>
+          </div>
+          <div class="mt-8">
+            <a href="/dashboard" class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
+              View My Bookings
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+import { supabase } from '../lib/supabase'
+import type { Pet } from '../lib/types'
+
+interface ServiceData {
+  name: string
+  description: string
+  price: string
+  duration?: string
+  image: string
+}
+
+const serviceList: ServiceData[] = [
+  { name: 'Pet Sitting', description: '¡Hogar, dulce hogar!', price: 'Q.125 /noche', image: 'https://images.unsplash.com/photo-1609103566358-ccab56549f8d?w=600&h=400&fit=crop' },
+  { name: 'Daycare', description: '¡Sal de casa sin preocupaciones!', price: 'Q.35 /día', image: 'https://images.unsplash.com/photo-1622050163882-6cdf82e5b4c2?w=600&h=400&fit=crop' },
+  { name: 'Homestay', description: '¡Olvídate de las perreras y las jaulas!', price: 'Q.95 /día', image: 'https://images.unsplash.com/photo-1602027439122-724dff5d9bc7?w=600&h=400&fit=crop' },
+  { name: 'Dog Walks', description: '¡Paseos divertidos y seguros!', price: 'Q.45 /hora', image: 'https://images.unsplash.com/photo-1530700131180-d43d9b8cc41f?w=600&h=400&fit=crop' },
+  { name: 'Home Visits', description: '¡Dosis de amor a domicilio!', price: 'Q.45 /hora', image: 'https://images.unsplash.com/photo-1769922927790-b7ac9f316191?w=600&h=400&fit=crop' },
+  { name: 'Photography', description: 'Uno... Dos... ¡Guau!', price: 'Q.350 /sesión', image: 'https://images.unsplash.com/photo-1761035912545-1ec51bbad426?w=600&h=400&fit=crop' },
+]
+
+interface BookingState {
+  currentStep: number
+  selectedService: { index: number; data: ServiceData } | null
+  startDate: string
+  endDate: string
+  totalPrice: number
+  petId: string
+  newPet: { name: string; type: string; size: string } | null
+  notes: string
+}
+
+const state: BookingState = {
+  currentStep: 1,
+  selectedService: null,
+  startDate: '',
+  endDate: '',
+  totalPrice: 0,
+  petId: '',
+  newPet: null,
+  notes: '',
+}
+
+const formContainer = document.querySelector('.booking-form-container') as HTMLElement
+const steps = [1, 2, 3, 4, 5]
+
+function updateProgress() {
+  steps.forEach((step) => {
+    const circle = document.querySelector(`[data-progress-step="${step}"] > div`)
+    const line = document.querySelector(`[data-progress-line="${step}"]`)
+
+    if (step < state.currentStep) {
+      circle?.classList.remove('bg-dark-200', 'text-gray-400')
+      circle?.classList.add('bg-accent', 'text-white')
+      if (line) line.classList.add('bg-accent')
+    } else if (step === state.currentStep) {
+      circle?.classList.remove('bg-dark-200', 'text-gray-400')
+      circle?.classList.add('bg-accent', 'text-white')
+    }
+  })
+
+  document.querySelectorAll('.step-content').forEach((el) => {
+    const step = parseInt(el.getAttribute('data-step') || '1')
+    if (step === state.currentStep) {
+      el.classList.remove('hidden')
+    } else {
+      el.classList.add('hidden')
+    }
+  })
+}
+
+function showStep(step: number) {
+  state.currentStep = step
+  updateProgress()
+}
+
+function parsePrice(priceStr: string): number {
+  const match = priceStr.match(/Q\.\s*(\d+)/)
+  return match ? parseInt(match[1]) : 0
+}
+
+function calculatePrice() {
+  if (!state.selectedService) return 0
+
+  const pricePerUnit = parsePrice(state.selectedService.data.price)
+  const start = new Date(state.startDate)
+  const end = state.endDate ? new Date(state.endDate) : start
+
+  const diffTime = Math.abs(end.getTime() - start.getTime())
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+
+  if (state.selectedService.data.price.includes('/noche') || state.selectedService.data.price.includes('/día')) {
+    return pricePerUnit * diffDays
+  } else if (state.selectedService.data.price.includes('/hora')) {
+    return pricePerUnit * diffDays * 8
+  }
+  return pricePerUnit
+}
+
+function selectService(index: number) {
+  state.selectedService = { index, data: serviceList[index] }
+  document.querySelectorAll('.service-card').forEach((card, i) => {
+    if (i === index) {
+      card.classList.add('border-accent')
+    } else {
+      card.classList.remove('border-accent')
+    }
+  })
+  document.getElementById('next-step-1')?.removeAttribute('disabled')
+}
+
+function loadUserPets() {
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (!session) return
+
+    supabase
+      .from('pets')
+      .select('*')
+      .eq('owner_id', session.user.id)
+      .then(({ data: pets }) => {
+        const petSelect = document.getElementById('pet-select') as HTMLSelectElement
+        if (pets && pets.length > 0) {
+          pets.forEach((pet: Pet) => {
+            const option = document.createElement('option')
+            option.value = pet.id
+            option.textContent = pet.name || 'Unnamed Pet'
+            petSelect.appendChild(option)
+          })
+        }
+      })
+  })
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadUserPets()
+
+  const minDate = new Date().toISOString().split('T')[0]
+  const startDateInput = document.getElementById('start-date') as HTMLInputElement
+  const endDateInput = document.getElementById('end-date') as HTMLInputElement
+
+  if (startDateInput) startDateInput.min = minDate
+  if (endDateInput) endDateInput.min = minDate
+
+  document.querySelectorAll('.service-card').forEach((card, index) => {
+    card.addEventListener('click', () => selectService(index))
+  })
+
+  document.getElementById('next-step-1')?.addEventListener('click', () => showStep(2))
+
+  document.getElementById('next-step-2')?.addEventListener('click', () => {
+    const startDate = (document.getElementById('start-date') as HTMLInputElement).value
+    const endDate = (document.getElementById('end-date') as HTMLInputElement).value
+
+    if (!startDate) {
+      alert('Please select a start date')
+      return
+    }
+
+    state.startDate = startDate
+    state.endDate = endDate
+    state.totalPrice = calculatePrice()
+
+    const priceSummary = document.getElementById('price-summary-2')
+    if (priceSummary) {
+      priceSummary.classList.remove('hidden')
+      document.getElementById('selected-service-name')!.textContent = state.selectedService?.data.name || '-'
+      document.getElementById('selected-duration')!.textContent = endDate
+        ? `${Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} days`
+        : '1 day'
+      document.getElementById('selected-total-price')!.textContent = `Q.${state.totalPrice}`
+    }
+
+    showStep(3)
+  })
+
+  document.getElementById('pet-select')?.addEventListener('change', (e) => {
+    const value = (e.target as HTMLSelectElement).value
+    const newPetSection = document.getElementById('new-pet-section')
+    if (value === '') {
+      newPetSection?.classList.remove('hidden')
+      state.petId = ''
+      state.newPet = { name: '', type: 'dog', size: 'medium' }
+    } else {
+      newPetSection?.classList.add('hidden')
+      state.petId = value
+      state.newPet = null
+    }
+  })
+
+  document.getElementById('next-step-3')?.addEventListener('click', () => {
+    const petSelect = document.getElementById('pet-select') as HTMLSelectElement
+
+    if (petSelect.value === '') {
+      const petName = (document.getElementById('pet-name') as HTMLInputElement).value
+      const petType = (document.getElementById('pet-type') as HTMLSelectElement).value
+      const petSize = (document.getElementById('pet-size') as HTMLSelectElement).value
+
+      if (!petName.trim()) {
+        alert('Please enter your pet name')
+        return
+      }
+
+      state.newPet = { name: petName, type: petType, size: petSize }
+      state.petId = ''
+    }
+
+    state.notes = (document.getElementById('pet-notes') as HTMLTextAreaElement).value
+
+    showStep(4)
+    updateConfirmationStep()
+  })
+
+  function updateConfirmationStep() {
+    if (!state.selectedService) return
+
+    document.getElementById('confirm-service-image')!.src = state.selectedService.data.image
+    document.getElementById('confirm-service-name')!.textContent = state.selectedService.data.name
+    document.getElementById('confirm-service-price')!.textContent = state.selectedService.data.price
+    document.getElementById('confirm-start-date')!.textContent = state.startDate || '-'
+    document.getElementById('confirm-end-date')!.textContent = state.endDate || '-'
+
+    const days = state.endDate
+      ? Math.ceil((new Date(state.endDate).getTime() - new Date(state.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
+      : 1
+    document.getElementById('confirm-duration')!.textContent = `${days} day${days > 1 ? 's' : ''}`
+
+    if (state.petId) {
+      supabase
+        .from('pets')
+        .select('name, type, size')
+        .eq('id', state.petId)
+        .single()
+        .then(({ data: pet }) => {
+          if (pet) {
+            document.getElementById('confirm-pet-name')!.textContent = pet.name || '-'
+            document.getElementById('confirm-pet-info')!.textContent = `${pet.type} / ${pet.size}`
+          }
+        })
+    } else if (state.newPet) {
+      document.getElementById('confirm-pet-name')!.textContent = state.newPet.name
+      document.getElementById('confirm-pet-info')!.textContent = `${state.newPet.type} / ${state.newPet.size}`
+    }
+
+    document.getElementById('confirm-total-price')!.textContent = `Q.${state.totalPrice}`
+  }
+
+  document.querySelectorAll('.back-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const goto = parseInt(btn.getAttribute('data-goto') || '1')
+      showStep(goto)
+    })
+  })
+
+  document.getElementById('submit-booking')?.addEventListener('click', async () => {
+    const errorEl = document.getElementById('error-message')
+    errorEl?.classList.add('hidden')
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        alert('Please sign in to make a booking')
+        window.location.href = '/login'
+        return
+      }
+
+      let petId = state.petId
+
+      if (state.newPet && !petId) {
+        const { data: newPetData, error: petError } = await supabase
+          .from('pets')
+          .insert({
+            owner_id: session.user.id,
+            name: state.newPet.name,
+            type: state.newPet.type as 'dog' | 'cat' | 'bird' | 'other',
+            size: state.newPet.size as 'small' | 'medium' | 'large',
+            notes: state.notes,
+          })
+          .select()
+          .single()
+
+        if (petError) throw petError
+        petId = newPetData.id
+      }
+
+      const serviceNameMap: Record<string, string> = {
+        'Pet Sitting': 'pet_sitting',
+        'Daycare': 'daycare',
+        'Homestay': 'homestay',
+        'Dog Walks': 'dog_walks',
+        'Home Visits': 'home_visits',
+        'Photography': 'photography',
+      }
+
+      const serviceDbName = state.selectedService ? serviceNameMap[state.selectedService.data.name] : null
+
+      const { data: servicesData } = await supabase
+        .from('services')
+        .select('id')
+        .eq('name', serviceDbName || '')
+        .single()
+
+      const { data: bookingData, error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          client_id: session.user.id,
+          service_id: servicesData?.id || null,
+          pet_id: petId,
+          start_date: state.startDate,
+          end_date: state.endDate || null,
+          total_price: state.totalPrice * 100,
+          notes: state.notes,
+          status: 'pending',
+        })
+        .select()
+        .single()
+
+      if (bookingError) throw bookingError
+
+      const ref = `HOM-${Date.now().toString(36).toUpperCase()}`
+      document.getElementById('booking-reference')!.textContent = ref
+
+      showStep(5)
+    } catch (error: any) {
+      console.error('Booking error:', error)
+      if (errorEl) {
+        errorEl.textContent = error.message || 'Failed to create booking. Please try again.'
+        errorEl.classList.remove('hidden')
+      }
+    }
+  })
+})
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

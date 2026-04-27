@@ -1,0 +1,73 @@
+---
+import { supabase } from '../lib/supabase';
+import { team } from '../data/site';
+import CaregiverCard from './CaregiverCard.astro';
+import type { Caregiver, Profile } from '../lib/types';
+
+interface CaregiverWithProfile extends Caregiver {
+  profiles?: Profile | null;
+}
+
+interface Props {
+  specialtyFilter?: string;
+}
+
+const { specialtyFilter } = Astro.props;
+
+const { data: caregivers, error } = await supabase
+  .from('caregivers')
+  .select('*, profiles(*)');
+
+const fallbackData: CaregiverWithProfile[] = team.map((member, index) => ({
+  profile_id: `fallback-${index}`,
+  specialties: member.specialties || [],
+  availability: { available: true },
+  hourly_rate: null,
+  service_types: [member.role],
+  is_verified: true,
+  average_rating: member.rating || 0,
+  profiles: {
+    id: `fallback-${index}`,
+    role: 'caregiver' as const,
+    full_name: member.name,
+    phone: member.whatsapp || null,
+    avatar_url: member.image,
+    address: null,
+    bio: member.bio,
+    created_at: new Date().toISOString(),
+  },
+}));
+
+const displayCaregivers: CaregiverWithProfile[] = (caregivers && caregivers.length > 0)
+  ? caregivers
+  : fallbackData;
+
+const filteredCaregivers = specialtyFilter
+  ? displayCaregivers.filter(c =>
+      c.specialties?.some(s =>
+        s.toLowerCase().includes(specialtyFilter.toLowerCase())
+      )
+    )
+  : displayCaregivers;
+---
+
+{error && (
+  <div class="text-red-400 text-center py-8">
+    Error al cargar cuidadores. Mostrando datos de respaldo.
+  </div>
+)}
+
+{filteredCaregivers.length === 0 ? (
+  <div class="text-center py-12">
+    <svg class="w-16 h-16 mx-auto text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+    </svg>
+    <p class="text-gray-400 text-lg">No hay cuidadores disponibles</p>
+  </div>
+) : (
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {filteredCaregivers.map((caregiver) => (
+      <CaregiverCard caregiver={caregiver} />
+    ))}
+  </div>
+)}
