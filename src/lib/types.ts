@@ -49,8 +49,10 @@ export interface Service {
   id: string
   name: string
   description: string | null
-  price_cents: number
+  base_price: number
+  price_unit: string
   duration_minutes: number | null
+  icon: string | null
   is_active: boolean
 }
 
