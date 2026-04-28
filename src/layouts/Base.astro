@@ -1,6 +1,7 @@
 ---
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
+import ChatWidget from '@/components/ChatWidget.astro';
 import { site } from '@/data/site';
 import '@/css/input.css';
 
@@ -46,6 +47,7 @@ const pageTitle = title === 'Home' ? site.name : `${title} | ${site.name}`;
       <slot />
     </main>
     <Footer />
+    <ChatWidget />
     <script src="@/scripts/main.ts"></script>
   </body>
 </html>

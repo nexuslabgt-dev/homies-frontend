@@ -1,0 +1,448 @@
+---
+import { supabase } from '../lib/supabase'
+import type { Message, Profile } from '../lib/types'
+
+const { data: { session } } = await supabase.auth.getSession()
+const user = session?.user
+
+let conversations: any[] = []
+let initialMessages: any[] = []
+
+if (user) {
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('*')
+
+  const { data: messages } = await supabase
+    .from('messages')
+    .select('*')
+    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+    .order('created_at', { ascending: false })
+
+  if (messages && profiles) {
+    const conversationMap = new Map<string, any>()
+
+    for (const msg of messages) {
+      const otherUserId = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id
+      if (!otherUserId || conversationMap.has(otherUserId)) continue
+
+      const profile = profiles.find(p => p.id === otherUserId)
+      if (!profile) continue
+
+      conversationMap.set(otherUserId, {
+        user_id: otherUserId,
+        profile,
+        last_message: msg,
+        unread_count: msg.receiver_id === user.id && !msg.read_at ? 1 : 0
+      })
+    }
+
+    conversations = Array.from(conversationMap.values())
+      .sort((a, b) => new Date(b.last_message.created_at).getTime() - new Date(a.last_message.created_at).getTime())
+  }
+}
+
+const SUPABASE_URL = import.meta.env.SUPABASE_URL
+---
+
+<div id="chat-widget" class="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+  <button
+    id="chat-toggle"
+    class="bg-primary-500 hover:bg-primary-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 relative"
+    aria-label="Abrir chat"
+  >
+    <svg id="chat-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+    </svg>
+    <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+    <span
+      id="unread-badge"
+      class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium hidden"
+    ></span>
+  </button>
+
+  <div
+    id="chat-panel"
+    class="bg-gray-900 rounded-2xl shadow-2xl w-80 sm:w-96 max-h-[500px] flex flex-col overflow-hidden border border-gray-700 hidden"
+  >
+    <div id="panel-header" class="bg-gray-800 px-4 py-3 flex items-center justify-between border-b border-gray-700">
+      <h3 class="text-white font-semibold">Mensajes</h3>
+    </div>
+
+    <div id="auth-message" class="flex-1 flex flex-col items-center justify-center p-6 text-center hidden">
+      <div class="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+      </div>
+      <p class="text-gray-300 mb-4">Inicia sesión para chatear</p>
+      <a href="/login" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+        Iniciar Sesión
+      </a>
+    </div>
+
+    <div id="conversations-list" class="flex-1 overflow-y-auto">
+      <div id="no-conversations" class="flex flex-col items-center justify-center h-full p-6 text-center hidden">
+        <div class="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+        </div>
+        <p class="text-gray-400">No hay conversaciones aún</p>
+      </div>
+    </div>
+
+    <div id="messages-view" class="flex-1 flex flex-col overflow-hidden hidden">
+      <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+      </div>
+
+      <form id="message-form" class="p-3 border-t border-gray-700 bg-gray-800">
+        <div class="flex gap-2">
+          <input
+            type="text"
+            id="message-input"
+            placeholder="Escribe un mensaje..."
+            class="flex-1 bg-gray-700 text-white placeholder-gray-400 px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 border-none"
+          />
+          <button
+            type="submit"
+            class="bg-primary-500 hover:bg-primary-600 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 disabled:bg-gray-600 disabled:cursor-not-allowed"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ user: user ? { id: user.id, email: user.email } : null, supabaseUrl: import.meta.env.SUPABASE_URL }}>
+  const userId = user?.id || null;
+
+  let isOpen = false;
+  let activeConversation = null;
+  let conversations = [];
+  let activeMessages = [];
+  let realtimeChannel = null;
+
+  const chatToggle = document.getElementById('chat-toggle');
+  const chatPanel = document.getElementById('chat-panel');
+  const chatIcon = document.getElementById('chat-icon');
+  const closeIcon = document.getElementById('close-icon');
+  const unreadBadge = document.getElementById('unread-badge');
+  const panelHeader = document.getElementById('panel-header');
+  const authMessage = document.getElementById('auth-message');
+  const conversationsList = document.getElementById('conversations-list');
+  const noConversations = document.getElementById('no-conversations');
+  const messagesView = document.getElementById('messages-view');
+  const messagesContainer = document.getElementById('messages-container');
+  const messageForm = document.getElementById('message-form');
+  const messageInput = document.getElementById('message-input');
+
+  function init() {
+    if (userId) {
+      loadConversations();
+      subscribeToMessages();
+    } else {
+      authMessage.classList.remove('hidden');
+    }
+
+    chatToggle.addEventListener('click', togglePanel);
+    messageForm.addEventListener('submit', sendMessage);
+  }
+
+  function togglePanel() {
+    isOpen = !isOpen;
+
+    if (isOpen) {
+      chatPanel.classList.remove('hidden');
+      chatIcon.classList.add('hidden');
+      closeIcon.classList.remove('hidden');
+    } else {
+      chatPanel.classList.add('hidden');
+      chatIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    }
+  }
+
+  async function loadConversations() {
+    if (!userId) return;
+
+    const { data: profiles } = await window.supabaseClient
+      .from('profiles')
+      .select('*');
+
+    const { data: messages } = await window.supabaseClient
+      .from('messages')
+      .select('*')
+      .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+      .order('created_at', { ascending: false });
+
+    if (!messages || !profiles) return;
+
+    const conversationMap = new Map();
+
+    for (const msg of messages) {
+      const otherUserId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
+      if (!otherUserId || conversationMap.has(otherUserId)) continue;
+
+      const profile = profiles.find(p => p.id === otherUserId);
+      if (!profile) continue;
+
+      conversationMap.set(otherUserId, {
+        user_id: otherUserId,
+        profile,
+        last_message: msg,
+        unread_count: msg.receiver_id === userId && !msg.read_at ? 1 : 0
+      });
+    }
+
+    conversations = Array.from(conversationMap.values())
+      .sort((a, b) => new Date(b.last_message.created_at).getTime() - new Date(a.last_message.created_at).getTime());
+
+    renderConversations();
+    updateUnreadCount();
+  }
+
+  function renderConversations() {
+    conversationsList.innerHTML = '';
+
+    if (conversations.length === 0) {
+      noConversations.classList.remove('hidden');
+      return;
+    }
+
+    noConversations.classList.add('hidden');
+
+    conversations.forEach(conv => {
+      const div = document.createElement('button');
+      div.className = 'w-full p-4 flex items-center gap-3 hover:bg-gray-800 transition-colors border-b border-gray-800 text-left';
+      div.innerHTML = `
+        <div class="w-12 h-12 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium flex-shrink-0">
+          <span>${conv.profile?.full_name?.charAt(0) || '?'}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between">
+            <span class="text-white font-medium truncate">${conv.profile?.full_name || 'Usuario'}</span>
+            <span class="text-gray-500 text-xs">${formatTime(conv.last_message?.created_at)}</span>
+          </div>
+          <p class="text-gray-400 text-sm truncate">${conv.last_message?.sender_id === userId ? 'Tú: ' : ''}${conv.last_message?.content || ''}</p>
+        </div>
+        ${conv.unread_count > 0 ? `<span class="bg-primary-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">${conv.unread_count}</span>` : ''}
+      `;
+      div.addEventListener('click', () => openConversation(conv));
+      conversationsList.appendChild(div);
+    });
+  }
+
+  async function openConversation(conv) {
+    activeConversation = conv;
+    authMessage.classList.add('hidden');
+    conversationsList.classList.add('hidden');
+    noConversations.classList.add('hidden');
+    messagesView.classList.remove('hidden');
+
+    panelHeader.innerHTML = `
+      <div class="flex items-center gap-2">
+        <button id="back-btn" class="text-gray-400 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-sm font-medium">
+            <span>${conv.profile?.full_name?.charAt(0) || '?'}</span>
+          </div>
+          <span class="text-white font-medium">${conv.profile?.full_name || ''}</span>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('back-btn').addEventListener('click', closeConversation);
+
+    const { data: messages } = await window.supabaseClient
+      .from('messages')
+      .select('*')
+      .or(`and(sender_id.eq.${userId},receiver_id.eq.${conv.user_id}),and(sender_id.eq.${conv.user_id},receiver_id.eq.${userId})`)
+      .order('created_at', { ascending: true });
+
+    activeMessages = messages || [];
+    renderMessages();
+
+    await window.supabaseClient
+      .from('messages')
+      .update({ read_at: new Date().toISOString() })
+      .eq('receiver_id', userId)
+      .eq('sender_id', conv.user_id)
+      .is('read_at', null);
+
+    conv.unread_count = 0;
+    updateUnreadCount();
+    scrollToBottom();
+  }
+
+  function closeConversation() {
+    activeConversation = null;
+    messagesView.classList.add('hidden');
+    conversationsList.classList.remove('hidden');
+    panelHeader.innerHTML = '<h3 class="text-white font-semibold">Mensajes</h3>';
+
+    if (conversations.length === 0) {
+      noConversations.classList.remove('hidden');
+    }
+
+    loadConversations();
+  }
+
+  function renderMessages() {
+    messagesContainer.innerHTML = '';
+
+    activeMessages.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = `flex ${msg.sender_id === userId ? 'justify-end' : 'justify-start'}`;
+      div.innerHTML = `
+        <div class="max-w-[75%] px-4 py-2 rounded-2xl text-sm ${msg.sender_id === userId ? 'bg-primary-500 text-white rounded-br-md' : 'bg-gray-700 text-white rounded-bl-md'}">
+          <p>${msg.content}</p>
+          <p class="text-xs mt-1 ${msg.sender_id === userId ? 'text-primary-200' : 'text-gray-400'}">${formatTime(msg.created_at)}</p>
+        </div>
+      `;
+      messagesContainer.appendChild(div);
+    });
+
+    const endDiv = document.createElement('div');
+    endDiv.id = 'messages-end';
+    messagesContainer.appendChild(endDiv);
+  }
+
+  async function sendMessage(e) {
+    e.preventDefault();
+
+    if (!messageInput.value.trim() || !activeConversation || !userId) return;
+
+    const content = messageInput.value.trim();
+    messageInput.value = '';
+
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    const token = session?.access_token;
+
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${supabaseUrl}/functions/v1/send-message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          receiver_id: activeConversation.user_id,
+          content
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.data) {
+        activeMessages.push(result.data);
+        activeConversation.last_message = result.data;
+        renderMessages();
+        scrollToBottom();
+        loadConversations();
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }
+
+  function subscribeToMessages() {
+    if (!userId) return;
+
+    realtimeChannel = window.supabaseClient
+      .channel('messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages'
+        },
+        async (payload) => {
+          const msg = payload.new;
+
+          if (msg.sender_id === userId || msg.receiver_id === userId) {
+            if (activeConversation && (msg.sender_id === activeConversation.user_id || msg.receiver_id === activeConversation.user_id)) {
+              if (!activeMessages.find(m => m.id === msg.id)) {
+                activeMessages.push(msg);
+                renderMessages();
+                scrollToBottom();
+
+                if (msg.receiver_id === userId && msg.sender_id !== userId) {
+                  await window.supabaseClient
+                    .from('messages')
+                    .update({ read_at: new Date().toISOString() })
+                    .eq('id', msg.id);
+                }
+              }
+            } else {
+              loadConversations();
+            }
+          }
+        }
+      )
+      .subscribe();
+  }
+
+  function updateUnreadCount() {
+    const total = conversations.reduce((sum, c) => sum + (c.unread_count || 0), 0);
+    if (total > 0) {
+      unreadBadge.textContent = total;
+      unreadBadge.classList.remove('hidden');
+    } else {
+      unreadBadge.classList.add('hidden');
+    }
+  }
+
+  function scrollToBottom() {
+    const end = document.getElementById('messages-end');
+    if (end) {
+      end.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  function formatTime(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Ahora';
+    if (minutes < 60) return `${minutes}m`;
+    if (hours < 24) return `${hours}h`;
+    if (days < 7) return `${days}d`;
+    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.SUPABASE_URL;
+  const supabaseKey = import.meta.env.SUPABASE_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    (window as any).supabaseClient = createClient(supabaseUrl, supabaseKey);
+  }
+</script>
+
+<script is:inline>
+  window.supabaseClient = window.supabaseClient || null;
+</script>
