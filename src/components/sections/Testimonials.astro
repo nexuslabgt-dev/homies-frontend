@@ -1,5 +1,8 @@
 ---
+import { getTranslations } from '@/i18n';
 import { testimonials } from '@/data/site';
+
+const t = getTranslations(Astro.currentLocale || 'es');
 ---
 
 <section class="section-padding bg-primary-600 dark:bg-primary-900">
@@ -7,10 +10,10 @@ import { testimonials } from '@/data/site';
     <!-- Header -->
     <div class="mx-auto max-w-2xl text-center" data-animate>
       <h2 class="font-display text-3xl font-regular text-white sm:text-5xl lg:text-6xl">
-        Testimonios de nuestros clientes
+        {t.testimonials.heading}
       </h2>
       <p class="mt-4 text-lg text-primary-100">
-        Nos enorgullece ofrecer un servicio de calidad que hace felices a las mascotas y a sus dueños.
+        {t.testimonials.subtitle}
       </p>
     </div>
 

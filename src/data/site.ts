@@ -233,7 +233,7 @@ export const team: TeamMember[] = [
     bio: '¡Hola! Soy Wendy también conocida cómo “Gwen”. Me tomo el tiempo para conocer las necesidades y personalidades de cada perro, para que se sientan amados y cuidados.',
     image: '/assets/img/gwendy_calderon.jpg',
     specialties: ['Behavior training', 'Pack dynamics', 'Puppy socialization'],
-    rating: 3,
+    rating: 4,
     whatsapp: 'https://api.whatsapp.com/send?phone=50234768028',
     email: 'homies.pets.care@gmail.com',
   },

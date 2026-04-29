@@ -1,0 +1,80 @@
+---
+import Base from '@/layouts/Base.astro';
+import TeamSection from '@/components/sections/Team.astro';
+import Cta from '@/components/sections/Cta.astro';
+---
+
+<Base title="Our Team" headerVariant="dark">
+  <!-- Hero Section -->
+  <section class="relative bg-primary-600 pb-20 pt-32 lg:pb-28 lg:pt-40">
+    <div class="container mx-auto px-4 text-center lg:px-8">
+      <h1 class="font-display text-4xl font-regular text-white sm:text-7xl">
+        Nuestro Equipo
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        Somos profesionales apasionados por el cuidado de mascotas, dedicados a brindar el mejor servicio con amor y ternura
+      </p>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <TeamSection
+    title="Somos Homies"
+    subtitle="Cada miembro de nuestro equipo es cuidadosamente seleccionado por su amor por los animales, experiencia y compromiso con el bienestar de tus mascotas. Conoce a las personas que hacen posible nuestro servicio excepcional."
+    showAll={true}
+  />
+
+  <!-- Why Our Team Section -->
+  <section class="section-padding bg-white dark:bg-gray-950">
+    <div class="container mx-auto container-padding">
+      <div class="mx-auto max-w-3xl text-center" data-animate>
+        <h2 class="font-display text-3xl font-regular text-gray-900 dark:text-white sm:text-5xl">
+          ¿Por qué elegirnos?
+        </h2>
+        <p class="mt-4 text-gray-600 dark:text-gray-400">
+          No somos solo cuidadores de mascotas: también compartimos su mundo
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-2xl bg-gray-50 p-8 text-center dark:bg-gray-900" data-animate data-delay="100">
+          <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+          </div>
+          <h3 class="mt-4 font-semibold text-gray-900 dark:text-white">Selección Cuidadosa</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Seleccionamos a todos nuestros Homies por su experiencia y su compromiso con el cuidado de tus mascotas.
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-gray-50 p-8 text-center dark:bg-gray-900" data-animate data-delay="200">
+          <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent-100 text-accent-600 dark:bg-accent-900/30 dark:text-accent-400">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <h3 class="mt-4 font-semibold text-gray-900 dark:text-white">Filtro de afecto</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Solo quienes acreditan su amor responsable por los animales forman parte de nuestro equipo de Homies.
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-gray-50 p-8 text-center dark:bg-gray-900" data-animate data-delay="300">
+          <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="mt-4 font-semibold text-gray-900 dark:text-white">Trayectoria confiable</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Con un historial probado, aseguramos que tus mascotas estén en manos expertas y afectuosas.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Cta />
+</Base>

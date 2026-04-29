@@ -1,0 +1,268 @@
+---
+import Base from '@/layouts/Base.astro';
+import { supabase } from '@/lib/supabase';
+
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) return Astro.redirect('/login');
+
+const userId = session.user.id;
+
+const { data: conversations } = await supabase
+  .from('messages')
+  .select(`
+    *,
+    sender: sender_id (full_name),
+    receiver: receiver_id (full_name)
+  `)
+  .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+  .order('created_at', { ascending: false });
+
+const uniqueUsers = new Map();
+conversations?.forEach((msg) => {
+  const otherUserId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
+  const otherUserName = msg.sender_id === userId ? msg.receiver?.full_name : msg.sender?.full_name;
+  if (otherUserId && !uniqueUsers.has(otherUserId)) {
+    uniqueUsers.set(otherUserId, {
+      user_id: otherUserId,
+      user_name: otherUserName ?? 'Unknown',
+      last_message: msg.content,
+      last_message_at: msg.created_at,
+    });
+  }
+});
+
+const { data: caregivers } = await supabase
+  .from('caregivers')
+  .select(`
+    *,
+    profiles:profile_id (full_name)
+  `)
+  .eq('is_verified', true);
+---
+
+<Base title="Messages" headerVariant="dark">
+  <section class="min-h-screen bg-gray-50 dark:bg-gray-950 py-12">
+    <div class="container mx-auto px-4 lg:px-8">
+      <div class="mb-8">
+        <h1 class="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+          Messages
+        </h1>
+        <p class="mt-1 text-gray-600 dark:text-gray-400">
+          Communicate with your caregivers.
+        </p>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-3">
+        <div class="lg:col-span-1">
+          <div class="mb-6 rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900">
+            <h2 class="mb-4 px-2 font-medium text-gray-900 dark:text-white">
+              New Message
+            </h2>
+            <form id="compose-form" class="space-y-4">
+              <div>
+                <label for="recipient" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  To
+                </label>
+                <select
+                  id="recipient"
+                  name="recipient"
+                  class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                >
+                  <option value="">Select caregiver</option>
+                  {caregivers?.map((cg) => (
+                    <option value={cg.profile_id}>
+                      {cg.profiles?.full_name ?? 'Caregiver'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="3"
+                  class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="Type your message..."
+                ></textarea>
+              </div>
+
+              <div id="message-status" class="hidden text-sm"></div>
+
+              <button type="submit" class="btn-primary w-full">
+                Send Message
+              </button>
+            </form>
+          </div>
+
+          <div class="rounded-xl bg-white shadow-sm dark:bg-gray-900">
+            <h2 class="border-b border-gray-100 px-4 py-3 font-medium text-gray-900 dark:border-gray-800 dark:text-white">
+              Conversations
+            </h2>
+            {uniqueUsers.size > 0 ? (
+              <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                {Array.from(uniqueUsers.values()).map((conv) => (
+                  <button
+                    class="w-full p-4 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                    data-user-id={conv.user_id}
+                  >
+                    <p class="font-medium text-gray-900 dark:text-white">
+                      {conv.user_name}
+                    </p>
+                    <p class="truncate text-sm text-gray-600 dark:text-gray-400">
+                      {conv.last_message ?? 'No messages'}
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                      {new Date(conv.last_message_at).toLocaleDateString()}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div class="p-6 text-center">
+                <p class="text-gray-600 dark:text-gray-400">No conversations yet.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div class="lg:col-span-2">
+          <div class="flex h-[600px] flex-col rounded-xl bg-white shadow-sm dark:bg-gray-900">
+            <div id="no-conversation" class="flex flex-1 flex-col items-center justify-center text-center">
+              <svg class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                Select a conversation
+              </h3>
+              <p class="mt-2 text-gray-600 dark:text-gray-400">
+                Choose a conversation from the list or send a new message.
+              </p>
+            </div>
+
+            <div id="conversation-view" class="hidden flex-1 flex-col">
+              <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-800">
+                <p id="conversation-with" class="font-medium text-gray-900 dark:text-white"></p>
+              </div>
+
+              <div id="messages-container" class="flex-1 space-y-4 overflow-y-auto p-6">
+              </div>
+
+              <form id="reply-form" class="border-t border-gray-100 p-4 dark:border-gray-800">
+                <div class="flex gap-3">
+                  <input
+                    type="text"
+                    id="reply-message"
+                    name="reply-message"
+                    class="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    placeholder="Type your reply..."
+                  />
+                  <button type="submit" class="btn-primary">
+                    Send
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { supabase } from '@/lib/supabase';
+
+  const composeForm = document.getElementById('compose-form') as HTMLFormElement;
+  const replyForm = document.getElementById('reply-form') as HTMLFormElement;
+  const statusDiv = document.getElementById('message-status') as HTMLDivElement;
+  const noConversation = document.getElementById('no-conversation') as HTMLDivElement;
+  const conversationView = document.getElementById('conversation-view') as HTMLDivElement;
+  const conversationWith = document.getElementById('conversation-with') as HTMLParagraphElement;
+  const messagesContainer = document.getElementById('messages-container') as HTMLDivElement;
+
+  let activeUserId: string | null = null;
+
+  async function sendMessage(recipientId: string, content: string) {
+    const { error } = await supabase.from('messages').insert({
+      sender_id: (await supabase.auth.getSession()).data.session?.user.id,
+      receiver_id: recipientId,
+      content,
+    });
+    return error;
+  }
+
+  async function loadConversation(userId: string, userName: string) {
+    activeUserId = userId;
+    conversationWith.textContent = userName;
+    noConversation.classList.add('hidden');
+    conversationView.classList.remove('hidden');
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data: messages } = await supabase
+      .from('messages')
+      .select('*')
+      .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${session.user.id})`)
+      .order('created_at', { ascending: true });
+
+    messagesContainer.innerHTML = '';
+    messages?.forEach((msg) => {
+      const isMine = msg.sender_id === session.user.id;
+      const div = document.createElement('div');
+      div.className = `flex ${isMine ? 'justify-end' : 'justify-start'}`;
+      div.innerHTML = `
+        <div class="max-w-xs rounded-lg px-4 py-2 ${isMine ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'}">
+          <p class="text-sm">${msg.content ?? ''}</p>
+          <p class="mt-1 text-xs opacity-70">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+        </div>
+      `;
+      messagesContainer.appendChild(div);
+    });
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  document.querySelectorAll('[data-user-id]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      loadConversation(btn.getAttribute('data-user-id')!, btn.querySelector('p')?.textContent ?? '');
+    });
+  });
+
+  composeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusDiv.classList.add('hidden');
+
+    const recipient = (document.getElementById('recipient') as HTMLSelectElement).value;
+    const message = (document.getElementById('message') as HTMLTextAreaElement).value;
+
+    if (!recipient || !message) return;
+
+    const error = await sendMessage(recipient, message);
+    if (error) {
+      statusDiv.textContent = error.message;
+      statusDiv.classList.remove('hidden', 'text-green-600', 'dark:text-green-400');
+      statusDiv.classList.add('text-red-600', 'dark:text-red-400');
+    } else {
+      statusDiv.textContent = 'Message sent!';
+      statusDiv.classList.remove('hidden', 'text-red-600', 'dark:text-red-400');
+      statusDiv.classList.add('text-green-600', 'dark:text-green-400');
+      (document.getElementById('message') as HTMLTextAreaElement).value = '';
+    }
+  });
+
+  replyForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!activeUserId) return;
+
+    const input = document.getElementById('reply-message') as HTMLInputElement;
+    const error = await sendMessage(activeUserId, input.value);
+    if (!error) {
+      input.value = '';
+      loadConversation(activeUserId, conversationWith.textContent ?? '');
+    }
+  });
+</script>

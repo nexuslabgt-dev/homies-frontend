@@ -1,7 +1,7 @@
 ---
-import { supabase } from '../lib/supabase';
-import ReviewCard from '../components/ReviewCard.astro';
-import CaregiverReviews from '../components/CaregiverReviews.astro';
+import { supabase } from '../../lib/supabase';
+import ReviewCard from '../../components/ReviewCard.astro';
+import CaregiverReviews from '../../components/CaregiverReviews.astro';
 
 const { data: reviews, error } = await supabase
   .from('reviews')

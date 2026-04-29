@@ -1,5 +1,9 @@
 ---
+import { getTranslations } from '@/i18n';
 import { services } from '@/data/site';
+
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 
 interface Props {
   title?: string;
@@ -8,8 +12,8 @@ interface Props {
 }
 
 const {
-  title = 'Nuestros Servicios',
-  subtitle = 'Sabemos que no esperas menos que lo mejor para tu mascota.',
+  title = t.services.heading,
+  subtitle = t.services.subtitle,
   showAll = false
 } = Astro.props;
 
@@ -38,12 +42,12 @@ const displayServices = showAll ? services : services.slice(0, 6);
         >
           {service.popular && (
             <span class="absolute right-4 top-4 z-10 rounded-full bg-accent-500 px-3 py-1 text-xs font-medium text-white">
-              Popular
+              {t.services.popular}
             </span>
           )}
           {service.soon && (
             <span class="absolute right-4 top-4 z-10 rounded-full bg-secondary-600 px-3 py-1 text-xs font-medium text-white">
-              Próximamente
+              {t.services.soon}
             </span>
           )}
           <div class="aspect-video overflow-hidden">
@@ -52,6 +56,8 @@ const displayServices = showAll ? services : services.slice(0, 6);
               alt={service.name}
               class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
+              srcset={`${service.image}?w=400 400w, ${service.image}?w=800 800w, ${service.image}?w=1200 1200w`}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           </div>
           <div class="p-6">
@@ -91,7 +97,7 @@ const displayServices = showAll ? services : services.slice(0, 6);
     {!showAll && (
       <div class="mt-12 text-center" data-animate>
         <a href="/services" class="btn-secondary">
-          Ver todos los servicios
+          {t.services.seeAll}
         </a>
       </div>
     )}

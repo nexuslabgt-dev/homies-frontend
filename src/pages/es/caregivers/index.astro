@@ -1,0 +1,67 @@
+---
+import CaregiverList from '../../../components/CaregiverList.astro';
+import { site } from '../../../data/site';
+
+const serviceTypes = [
+  'Todos',
+  'Show grooming',
+  'Anxious pets',
+  'Senior pets',
+  'Creative grooming',
+  'Asian fusion',
+  'Poodles',
+  'Behavior training',
+  'Pack dynamics',
+  'Puppy socialization',
+  'Special needs pets',
+  'Medication administration',
+  'Senior care',
+];
+
+const selectedSpecialty = Astro.url.searchParams.get('specialty') || 'Todos';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cuidadores - {site.name}</title>
+    <meta name="description" content="Conoce a nuestros cuidadores certificados. Cuidado amoroso y profesional para tu mascota." />
+  </head>
+  <body class="bg-dark-100 min-h-screen">
+    <main>
+      <section class="bg-dark-200 border-b border-dark-300">
+        <div class="container mx-auto px-4 py-16">
+          <h1 class="text-4xl md:text-5xl font-bold text-white text-center mb-4">
+            Nuestros Homies
+          </h1>
+          <p class="text-gray-400 text-center max-w-2xl mx-auto text-lg">
+            Conoce a nuestro equipo de cuidadores certificados. Cada Homie está comprometido con el bienestar y seguridad de tu mascota.
+          </p>
+        </div>
+      </section>
+
+      <section class="container mx-auto px-4 py-12">
+        <div class="mb-8">
+          <label class="text-gray-300 text-sm font-medium mb-2 block">Filtrar por especialidad:</label>
+          <div class="flex flex-wrap gap-2">
+            {serviceTypes.map((type) => (
+              <a
+                href={type === 'Todos' ? '/caregivers' : `/caregivers?specialty=${encodeURIComponent(type)}`}
+                class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedSpecialty === type
+                    ? 'bg-primary text-white'
+                    : 'bg-dark-200 text-gray-400 hover:bg-dark-300 hover:text-white'
+                }`}
+              >
+                {type}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <CaregiverList specialtyFilter={selectedSpecialty === 'Todos' ? undefined : selectedSpecialty} />
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,5 +1,8 @@
 ---
+import { getTranslations } from '@/i18n';
 import { site } from '@/data/site';
+
+const t = getTranslations(Astro.currentLocale || 'es');
 ---
 
 <section class="section-padding bg-linear-to-r from-primary-600 to-primary-700">
@@ -15,10 +18,10 @@ import { site } from '@/data/site';
       </div>
 
       <h2 class="font-display text-3xl font-regular text-white sm:text-5xl lg:text-7xl">
-        ¡Haz feliz a tu mascota!
+        {t.cta.heading}
       </h2>
       <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
-        Agenda hoy y dale a tu mascota el cuidado que merece. ¡Clientes nuevos reciben 15% de descuento en su primer servicio de pet sitting!
+        {t.cta.subtitle}
       </p>
 
       <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -29,7 +32,7 @@ import { site } from '@/data/site';
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          Reserva ahora
+          {t.cta.bookNow}
         </a>
         <a
           href={`tel:${site.phone.replace(/[^0-9]/g, '')}`}

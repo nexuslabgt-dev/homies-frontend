@@ -5,6 +5,8 @@ import ChatWidget from '@/components/ChatWidget.astro';
 import { site } from '@/data/site';
 import '@/css/input.css';
 
+const locale = Astro.currentLocale || 'es'
+
 interface Props {
   title: string;
   description?: string;
@@ -16,7 +18,7 @@ const pageTitle = title === 'Home' ? site.name : `${title} | ${site.name}`;
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang={locale} class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

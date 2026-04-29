@@ -1,5 +1,8 @@
 ---
+import { getTranslations } from '@/i18n';
 import { faqs } from '@/data/site';
+
+const t = getTranslations(Astro.currentLocale || 'es');
 
 interface Props {
   title?: string;
@@ -7,8 +10,8 @@ interface Props {
 }
 
 const {
-  title = '¿Cómo funciona?',
-  subtitle = 'El proceso es muy sencillo:'
+  title = t.faq.heading,
+  subtitle = t.faq.subtitle
 } = Astro.props;
 ---
 
@@ -49,13 +52,13 @@ const {
       <!-- Contact CTA -->
       <div class="mt-12 rounded-2xl bg-primary-50 p-8 text-center dark:bg-gray-900" data-animate>
         <h3 class="font-semibold text-gray-900 dark:text-white">
-          ¿Tienes preguntas?
+          {t.faq.contact}
         </h3>
         <p class="mt-2 text-gray-600 dark:text-gray-400">
-          Nos encantaría ayudarte. No dudes en contactarnos para cualquier consulta o para obtener más información sobre nuestros servicios.
+          {t.faq.contactDesc}
         </p>
         <a href="/contact" class="btn-primary mt-4">
-          Contáctanos
+          {t.faq.contactCta}
         </a>
       </div>
     </div>

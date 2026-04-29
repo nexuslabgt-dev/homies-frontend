@@ -1,0 +1,305 @@
+---
+import Base from '@/layouts/Base.astro';
+import FAQ from '@/components/sections/FAQ.astro';
+import { site } from '@/data/site';
+---
+
+<Base title="Contact" headerVariant="dark">
+  <!-- Hero Section -->
+  <section class="relative bg-primary-600 pb-20 pt-32 lg:pb-28 lg:pt-40">
+    <div class="container mx-auto px-4 text-center lg:px-8">
+      <h1 class="font-serif text-4xl font-bold text-white sm:text-5xl">
+        Get in Touch
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-primary-100">
+        Book an appointment, ask a question, or just say hello. We'd love to hear from you!
+      </p>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="section-padding bg-white dark:bg-gray-950">
+    <div class="container mx-auto container-padding">
+      <div class="grid gap-12 lg:grid-cols-2">
+        <!-- Contact Form -->
+        <div data-animate>
+          <h2 class="font-serif text-2xl font-bold text-gray-900 dark:text-white">
+            Book an Appointment
+          </h2>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Fill out the form below and we'll get back to you within 24 hours.
+          </p>
+
+          <form class="mt-8 space-y-6">
+            <div class="grid gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  for="firstName"
+                  class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  required
+                  class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="Jane Smith"
+                />
+              </div>
+              <div>
+                <label
+                  for="phone"
+                  class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  required
+                  class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="email"
+                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                placeholder="jane@example.com"
+              />
+            </div>
+
+            <div class="grid gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  for="petName"
+                  class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Pet's Name
+                </label>
+                <input
+                  type="text"
+                  id="petName"
+                  name="petName"
+                  class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="Max"
+                />
+              </div>
+              <div>
+                <label
+                  for="petType"
+                  class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Pet Type
+                </label>
+                <select
+                  id="petType"
+                  name="petType"
+                  class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                >
+                  <option value="">Select pet type</option>
+                  <option value="dog">Dog</option>
+                  <option value="cat">Cat</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="service"
+                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Service Interested In
+              </label>
+              <select
+                id="service"
+                name="service"
+                class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              >
+                <option value="">Select a service</option>
+                <option value="grooming">Full Grooming</option>
+                <option value="bath">Bath & Brush</option>
+                <option value="daycare">Daycare</option>
+                <option value="boarding">Overnight Boarding</option>
+                <option value="nails">Nail Trim</option>
+                <option value="puppy">Puppy Package</option>
+                <option value="other">Other / General Inquiry</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="message"
+                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Additional Information
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                rows="4"
+                class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                placeholder="Tell us about your pet, preferred dates, or any special requirements..."
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary w-full sm:w-auto">
+              Submit Request
+            </button>
+          </form>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="lg:pl-12" data-animate data-delay="200">
+          <h2 class="font-serif text-2xl font-bold text-gray-900 dark:text-white">
+            Contact Information
+          </h2>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Reach out through any of these channels.
+          </p>
+
+          <div class="mt-8 space-y-6">
+            <div class="flex gap-4">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-gray-800 dark:text-primary-400">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 dark:text-white">Email</h3>
+                <p class="text-gray-600 dark:text-gray-400">{site.email}</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-gray-800 dark:text-primary-400">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 dark:text-white">Phone</h3>
+                <p class="text-gray-600 dark:text-gray-400">{site.phone}</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-gray-800 dark:text-primary-400">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 dark:text-white">Hours</h3>
+                <p class="text-gray-600 dark:text-gray-400">Mon-Fri: {site.hours.weekdays}</p>
+                <p class="text-gray-600 dark:text-gray-400">Saturday: {site.hours.saturday}</p>
+                <p class="text-gray-600 dark:text-gray-400">Sunday: {site.hours.sunday}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Map -->
+          <div class="mt-12 overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-900">
+            <div class="aspect-video">
+              <iframe
+                src="https://www.openstreetmap.org/export/embed.html?bbox=-97.7622%2C30.2572%2C-97.7322%2C30.2872&layer=mapnik&marker=30.2722%2C-97.7472"
+                class="h-full w-full border-0"
+                loading="lazy"
+                title="Office location map - Austin, TX"
+                allowfullscreen></iframe>
+            </div>
+            <div class="p-6">
+              <h3 class="font-semibold text-gray-900 dark:text-white">
+                {site.name}
+              </h3>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                {site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}
+              </p>
+              <a
+                href={`https://maps.google.com/?q=${encodeURIComponent(`${site.address.street}, ${site.address.city}, ${site.address.state}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                Get Directions
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- New Client Info -->
+  <section id="new-clients" class="section-padding bg-primary-50 dark:bg-gray-900">
+    <div class="container mx-auto container-padding">
+      <div class="mx-auto max-w-3xl text-center" data-animate>
+        <h2 class="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+          New Client Information
+        </h2>
+        <p class="mt-4 text-gray-600 dark:text-gray-400">
+          Welcome to Paws & Play! Here's what you need to know for your first visit.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800" data-animate data-delay="100">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 class="mt-4 font-semibold text-gray-900 dark:text-white">Vaccination Records</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Please bring proof of current vaccinations: Rabies, Distemper/Parvo, and Bordetella for dogs; Rabies and FVRCP for cats.
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800" data-animate data-delay="200">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-accent-100 text-accent-600 dark:bg-accent-900/30 dark:text-accent-400">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="mt-4 font-semibold text-gray-900 dark:text-white">Arrive 15 Minutes Early</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            First-time visits require a brief consultation to discuss your pet's needs, temperament, and any special requirements.
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800" data-animate data-delay="300">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="mt-4 font-semibold text-gray-900 dark:text-white">New Client Discount</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            First-time customers receive 15% off their first grooming service. Mention this offer when booking!
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <FAQ />
+</Base>

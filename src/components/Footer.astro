@@ -1,6 +1,8 @@
 ---
+import { getTranslations } from '@/i18n';
 import { site, footer } from '@/data/site';
 
+const t = getTranslations(Astro.currentLocale || 'es');
 const currentYear = new Date().getFullYear();
 ---
 
@@ -94,22 +96,22 @@ const currentYear = new Date().getFullYear();
     <div class="mt-12 grid gap-8 border-t border-gray-800 pt-8 sm:grid-cols-2 lg:grid-cols-3">
       <div>
         <h4 class="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
-          Horarios
+          {t.footer.hours}
         </h4>
         <p class="text-sm text-gray-400">
-          Nos ajustamos a tu horario. Contáctanos para coordinar el mejor momento para cuidar a tu mascota.
+          {t.footer.hoursDesc}
         </p>
       </div>
       <div>
         <h4 class="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
-          Contacto
+          {t.footer.contact}
         </h4>
         <p class="text-sm text-gray-400">{site.email}</p>
         <p class="text-sm text-gray-400">{site.phone}</p>
       </div>
       <div>
         <h4 class="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
-          Ubicación
+          {t.footer.location}
         </h4>
         <p class="text-sm text-gray-400">
           {site.address.street}
@@ -126,8 +128,8 @@ const currentYear = new Date().getFullYear();
         {footer.copyright}
       </p>
       <div class="flex gap-6 text-sm text-gray-500">
-        <a href="/privacy" class="hover:text-white">Política de Privacidad</a>
-        <a href="/terms" class="hover:text-white">Condiciones de Uso</a>
+        <a href="/privacy" class="hover:text-white">{t.footer.privacy}</a>
+        <a href="/terms" class="hover:text-white">{t.footer.terms}</a>
       </div>
     </div>
   </div>

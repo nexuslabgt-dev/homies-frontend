@@ -1,5 +1,9 @@
 ---
+import { getTranslations } from '@/i18n';
 import { hero } from '@/data/site';
+
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 ---
 
 <section class="relative overflow-hidden bg-linear-to-br from-primary-50 via-white to-accent-50 pt-24 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 lg:pt-32">
@@ -8,18 +12,27 @@ import { hero } from '@/data/site';
       <!-- Content -->
       <div class="max-w-xl" data-animate>
         <h1 class="font-display text-4xl font-regular leading-tight text-gray-900 dark:text-white sm:text-6xl lg:text-6xl">
-          {hero.title}
+          {t.hero.title}
         </h1>
         <p class="mt-6 text-lg text-gray-600 dark:text-gray-400">
           {hero.subtitle}
         </p>
         <div class="mt-8 flex flex-col gap-4 sm:flex-row">
           <a href={hero.primaryCta.url} class="btn-primary">
-            {hero.primaryCta.text}
+            {t.hero.cta}
           </a>
           <a href={hero.secondaryCta.url} class="btn-secondary">
-            {hero.secondaryCta.text}
+            {t.hero.ctaSecondary}
           </a>
+        </div>
+        <!-- Stats -->
+        <div class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {hero.stats.map(stat => (
+            <div class="text-center">
+              <div class="text-2xl font-bold text-primary-500 sm:text-3xl">{stat.value}</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -28,9 +41,11 @@ import { hero } from '@/data/site';
         <div class="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl">
           <img
             src={hero.image}
-            alt="Happy dog at pet care facility"
+            alt={t.hero.imageAlt}
             class="h-full w-full object-cover"
             loading="eager"
+            srcset={`${hero.image}?w=400 400w, ${hero.image}?w=800 800w, ${hero.image}?w=1200 1200w`}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         </div>
         <!-- Decorative elements -->

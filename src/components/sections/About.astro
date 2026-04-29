@@ -1,5 +1,9 @@
 ---
+import { getTranslations } from '@/i18n';
 import { about } from '@/data/site';
+
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 ---
 
 <section id="about" class="section-padding bg-primary-50 dark:bg-gray-900">
@@ -10,15 +14,17 @@ import { about } from '@/data/site';
         <div class="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-xl">
           <img
             src={about.image}
-            alt="Servicios de atención de mascotas en Homies"
+            alt={about.title}
             class="h-full w-full object-cover"
             loading="lazy"
+            srcset={`${about.image}?w=400 400w, ${about.image}?w=800 800w, ${about.image}?w=1200 1200w`}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         </div>
         <!-- Experience badge -->
-        <div class="absolute -bottom-6 -right-6 flex h-32 w-32 flex-col items-center justify-center rounded-full bg-primary-600 text-white shadow-xl sm:h-40 sm:w-40">
+        <div class="absolute -bottom-4 -right-4 flex h-32 w-32 flex-col items-center justify-center rounded-full bg-primary-600 text-white shadow-xl sm:-bottom-6 sm:-right-6 sm:h-40 sm:w-40">
           <span class="text-3xl font-bold sm:text-4xl">♥+</span>
-          <span class="text-sm">Confianza</span>
+          <span class="text-sm">{t.about.trust}</span>
         </div>
       </div>
 
@@ -60,7 +66,7 @@ import { about } from '@/data/site';
             </div>
           ))}
           <a href="/team" class="btn-secondary mt-4">
-            Conoce a nuestro equipo
+            {t.about.learnMore}
           </a>
         </div>
       </div>

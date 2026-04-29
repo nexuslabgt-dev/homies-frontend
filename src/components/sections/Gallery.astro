@@ -1,5 +1,8 @@
 ---
+import { getTranslations } from '@/i18n';
 import { gallery } from '@/data/site';
+
+const t = getTranslations(Astro.currentLocale || 'es');
 
 interface Props {
   title?: string;
@@ -8,8 +11,8 @@ interface Props {
 }
 
 const {
-  title = 'Galería de Fotos',
-  subtitle = 'Descubre nuestros amiguitos luciéndose',
+  title = t.gallery.heading,
+  subtitle = t.gallery.subtitle,
   limit = 8
 } = Astro.props;
 
@@ -56,7 +59,7 @@ const displayImages = gallery.slice(0, limit);
     <!-- CTA -->
     <div class="mt-12 text-center" data-animate>
       <p class="text-gray-600 dark:text-gray-400">
-        ¡Síguenos en Instagram para ver todo sobre Homies!
+        {t.gallery.instagram}
       </p>
       <a
         href="https://www.instagram.com/homies.pets/"
