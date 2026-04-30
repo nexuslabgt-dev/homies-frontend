@@ -1,0 +1,35 @@
+---
+import { getTranslations } from '@/i18n';
+import BeforeAfter from '../BeforeAfter.astro';
+import { beforeAfterGallery } from '@/data/beforeAfter';
+
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
+---
+
+<section class="section-padding bg-gray-50 dark:bg-gray-900">
+  <div class="container mx-auto container-padding">
+    <div class="mx-auto max-w-2xl text-center" data-animate>
+      <h2 class="font-display text-3xl font-regular text-gray-900 dark:text-white sm:text-5xl">
+        {t.beforeAfter?.heading || 'Antes y Después'}
+      </h2>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
+        {t.beforeAfter?.subtitle || 'Transformaciones de nuestros servicios'}
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-8 sm:grid-cols-2">
+      {beforeAfterGallery.map((item, index) => (
+        <div data-animate data-delay={index * 100}>
+          <BeforeAfter
+            before={item.before}
+            after={item.after}
+            beforeAlt={item.beforeAlt}
+            afterAlt={item.afterAlt}
+            description={item.description}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

@@ -87,6 +87,13 @@ export interface Message {
   created_at: string
 }
 
+export interface NewsletterSubscriber {
+  id: string
+  email: string
+  subscribed_at: string
+  is_active: boolean
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -124,6 +131,11 @@ export interface Database {
         Row: Message
         Insert: Omit<Message, 'id' | 'created_at'>
         Update: Partial<Omit<Message, 'id' | 'created_at'>>
+      }
+      newsletter_subscribers: {
+        Row: NewsletterSubscriber
+        Insert: Omit<NewsletterSubscriber, 'id' | 'subscribed_at'>
+        Update: Partial<Omit<NewsletterSubscriber, 'id' | 'subscribed_at'>>
       }
     }
   }

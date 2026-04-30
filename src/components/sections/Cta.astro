@@ -1,6 +1,7 @@
 ---
 import { getTranslations } from '@/i18n';
 import { site } from '@/data/site';
+import Newsletter from '@/components/Newsletter.astro';
 
 const t = getTranslations(Astro.currentLocale || 'es');
 ---
@@ -45,5 +46,7 @@ const t = getTranslations(Astro.currentLocale || 'es');
         </a>
       </div>
     </div>
+
+    <Newsletter />
   </div>
 </section>

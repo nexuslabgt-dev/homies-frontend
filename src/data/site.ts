@@ -418,6 +418,7 @@ export const footer = {
       items: [
         { text: 'Sobre Nosotros', url: '/#about' },
         { text: 'Nuestro equipo', url: '/team' },
+        { text: 'Zona de Cobertura', url: '/coverage' },
         { text: 'Galería', url: '/#gallery' },
         { text: 'Contacto', url: '/contact' },
       ],

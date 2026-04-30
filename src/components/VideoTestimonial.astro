@@ -1,0 +1,84 @@
+---
+interface Props {
+  videoUrl: string;
+  author: string;
+  pet?: string;
+  poster?: string;
+}
+
+const { videoUrl, author, pet, poster } = Astro.props;
+
+const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
+const isVimeo = videoUrl.includes('vimeo.com');
+const isTikTok = videoUrl.includes('tiktok.com');
+
+let embedUrl = videoUrl;
+let videoId = '';
+
+if (isYouTube) {
+  const match = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+  videoId = match ? match[1] : '';
+  embedUrl = `https://www.youtube.com/embed/${videoId}`;
+}
+
+if (isVimeo) {
+  const match = videoUrl.match(/vimeo\.com\/(\d+)/);
+  videoId = match ? match[1] : '';
+  embedUrl = `https://player.vimeo.com/video/${videoId}`;
+}
+---
+
+<div class="video-testimonial rounded-2xl overflow-hidden bg-gray-900 dark:bg-gray-800">
+  <div class="aspect-video">
+    {isYouTube && (
+      <iframe
+        src={embedUrl}
+        class="w-full h-full"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    )}
+    {isVimeo && (
+      <iframe
+        src={embedUrl}
+        class="w-full h-full"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    )}
+    {isTikTok && (
+      <div class="relative w-full h-full">
+        <blockquote class="tiktok-embed" cite={videoUrl} data-video-id={videoId}>
+          <section>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={videoUrl}
+            >
+              View on TikTok
+            </a>
+          </section>
+        </blockquote>
+        <script async src="https://www.tiktok.com/embed.js"></script>
+      </div>
+    )}
+    {!isYouTube && !isVimeo && !isTikTok && (
+      <video
+        controls
+        src={videoUrl}
+        poster={poster}
+        class="w-full h-full object-cover"
+      ></video>
+    )}
+  </div>
+  <div class="p-4 text-center">
+    <cite class="not-italic">
+      <span class="font-medium text-gray-900 dark:text-white">{author}</span>
+      {pet && (
+        <span class="text-gray-600 dark:text-gray-400"> - {pet}</span>
+      )}
+    </cite>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+---
+import { getTranslations } from '@/i18n';
+
+interface Props {
+  before: string;
+  after: string;
+  beforeAlt?: string;
+  afterAlt?: string;
+  description?: string;
+}
+
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
+
+const {
+  before,
+  after,
+  beforeAlt = 'Before',
+  afterAlt = 'After',
+  description
+} = Astro.props;
+---
+
+<div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div class="relative overflow-hidden rounded-xl">
+      <img
+        src={before}
+        alt={beforeAlt}
+        class="h-full w-full object-cover aspect-[4/3]"
+        loading="lazy"
+      />
+      <span class="absolute bottom-2 left-2 rounded-full bg-gray-900/80 px-3 py-1 text-xs font-medium text-white">
+        {t.beforeAfter?.before || 'Antes'}
+      </span>
+    </div>
+    <div class="relative overflow-hidden rounded-xl">
+      <img
+        src={after}
+        alt={afterAlt}
+        class="h-full w-full object-cover aspect-[4/3]"
+        loading="lazy"
+      />
+      <span class="absolute bottom-2 left-2 rounded-full bg-primary-600/80 px-3 py-1 text-xs font-medium text-white">
+        {t.beforeAfter?.after || 'Después'}
+      </span>
+    </div>
+  </div>
+  {description && (
+    <p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+      {description}
+    </p>
+  )}
+</div>
