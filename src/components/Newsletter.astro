@@ -1,0 +1,107 @@
+---
+import { getTranslations } from '@/i18n';
+
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
+---
+
+<div class="bg-gradient-to-r from-primary-600 to-primary-700 py-12">
+  <div class="container mx-auto px-4">
+    <div class="mx-auto max-w-xl text-center" data-animate>
+      <div class="mb-4 flex justify-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+          <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+      </div>
+      <h3 class="font-display text-2xl font-regular text-white sm:text-3xl">
+        {t.newsletter.title}
+      </h3>
+      <p class="mt-2 text-primary-100">
+        {t.newsletter.subtitle}
+      </p>
+
+      <form id="newsletter-form" class="mt-6 flex flex-col gap-3 sm:flex-row">
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder={t.newsletter.placeholder}
+          class="flex-1 rounded-full px-6 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+        />
+        <button
+          type="submit"
+          class="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-8 py-3 text-sm font-semibold text-white transition-all hover:bg-accent/90"
+        >
+          <span>{t.newsletter.subscribe}</span>
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+      </form>
+
+      <div id="newsletter-success" class="mt-4 hidden">
+        <div class="flex items-center justify-center gap-2 text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>{t.newsletter.success}</span>
+        </div>
+      </div>
+
+      <div id="newsletter-error" class="mt-4 hidden">
+        <div class="text-sm text-red-200">
+          {t.newsletter.error}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { supabase } from '../lib/supabase'
+
+  const form = document.getElementById('newsletter-form') as HTMLFormElement;
+  const successEl = document.getElementById('newsletter-success');
+  const errorEl = document.getElementById('newsletter-error');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const email = formData.get('email') as string;
+
+    successEl?.classList.add('hidden');
+    errorEl?.classList.add('hidden');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      if (errorEl) {
+        errorEl.textContent = 'Invalid email format';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert({ email, is_active: true });
+
+      if (error) {
+        if (error.code === '23505') {
+          throw new Error('Email already subscribed');
+        }
+        throw error;
+      }
+
+      form.reset();
+      successEl?.classList.remove('hidden');
+    } catch (err: any) {
+      if (errorEl) {
+        errorEl.textContent = err.message || 'Failed to subscribe. Please try again.';
+        errorEl.classList.remove('hidden');
+      }
+    }
+  });
+</script>

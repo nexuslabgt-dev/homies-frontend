@@ -32,6 +32,10 @@ export const es = {
     subtitle: 'Descubre nuestros amiguitos luciéndose',
     instagram: '¡Síguenos en Instagram para ver todo sobre Homies!',
   },
+  instagramFeed: {
+    heading: 'Síguenos en Instagram',
+    subtitle: 'Síguenos para ver más de Homies',
+  },
   faq: {
     heading: '¿Cómo funciona?',
     subtitle: 'El proceso es muy sencillo:',
@@ -57,6 +61,17 @@ export const es = {
     subtitle: 'Agenda hoy y dale a tu mascota el cuidado que merece. ¡Clientes nuevos reciben 15% de descuento en su primer servicio de pet sitting!',
     bookNow: 'Reserva ahora',
     phone: 'Llámanos',
+  },
+  availabilityCounter: {
+    available: 'Cuidadores disponibles',
+  },
+  newsletter: {
+    title: '¡Suscríbete a nuestro newsletter!',
+    subtitle: 'Recibe ofertas exclusivas, consejos para el cuidado de tu mascota y las últimas novedades de Homies.',
+    placeholder: 'Tu correo electrónico',
+    subscribe: 'Suscribirme',
+    success: '¡Gracias por suscribirte!',
+    error: 'Error al suscribirse. Inténtalo de nuevo.',
   },
   footer: {
     hours: 'Horarios',
@@ -182,6 +197,8 @@ export const es = {
     leaveReviewBtn: 'Dejar reseña',
     service: 'Servicio',
     caregiver: 'Cuidador',
+    videoCredits: 'Video testimonios',
+    videoBy: 'Video por',
   },
   dashboard: {
     welcome: 'Bienvenido de nuevo',
@@ -432,6 +449,19 @@ export const es = {
     trajectory: 'Trayectoria confiable',
     trajectoryDesc: 'Con un historial probado, aseguramos que tus mascotas estén en manos expertas y afectuosas.',
   },
+  blog: {
+    heading: 'Blog de Tips',
+    subtitle: 'Consejos y guías para el cuidado de tus mascotas',
+    pageTitle: 'Blog de Tips',
+    seeAll: 'Ver todas las publicaciones',
+    back: 'Volver al blog',
+  },
+  beforeAfter: {
+    heading: 'Antes y Después',
+    subtitle: 'Transformaciones de nuestros servicios',
+    before: 'Antes',
+    after: 'Después',
+  },
   common: {
     loading: 'Cargando...',
     error: 'Error',
@@ -461,5 +491,27 @@ export const es = {
     caregiver: 'Cuidador',
     client: 'Cliente',
     user: 'Usuario',
+  },
+  coverage: {
+    title: 'Zona de Cobertura',
+    subtitle: 'Estamos ubicados en Antigua Guatemala y ofrecemos servicios en las siguientes áreas:',
+    zonesTitle: 'Nuestras Zonas',
+    center: 'Centro',
+    centerDesc: 'Antigua Guatemala',
+    jocotenango: 'Jocotenango',
+    jocotenangoDesc: '5 km',
+    ciudadVieja: 'Ciudad Vieja',
+    ciudadViejaDesc: '8 km',
+   ctaText: 'Reserva ahora y recibe un descuento',
+    note: '¿No estás seguro si cubrimos tu zona? Contáctanos y te ayudaremos.',
+    getDirections: 'Ver en Google Maps',
+  },
+  pricing: {
+    discountBadge: 'Descuento disponible',
+    walks5Plus: '5+ paseos = 10% off',
+    weekly7Plus: 'Reserva semanal (7+) = 15% off',
+    pets2Plus: '2+ mascotas = 20% combo off',
+    discountApplied: 'Descuento aplicado',
+    noDiscount: 'Sin descuento',
   },
 }

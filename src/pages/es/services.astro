@@ -1,6 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { serviceCategories, services } from '@/data/site';
+import BeforeAfterSection from '@/components/sections/BeforeAfterSection.astro';
 ---
 
 <Base title="Services" headerVariant="dark">
@@ -15,6 +16,8 @@ import { serviceCategories, services } from '@/data/site';
       </p>
     </div>
   </section>
+
+  <BeforeAfterSection />
 
   <!-- Services by Category -->
   {serviceCategories.map((category, catIndex) => (

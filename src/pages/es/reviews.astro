@@ -1,9 +1,21 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ReviewCard from '@/components/ReviewCard.astro';
+import VideoTestimonial from '@/components/VideoTestimonial.astro';
 import { supabase } from '@/lib/supabase';
+import { getTranslations } from '@/i18n';
 
 const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
+
+const videoTestimonials = [
+  {
+    videoUrl: 'https://www.tiktok.com/@homies.pets.gt/video/1234567890',
+    author: 'Maria Garcia',
+    pet: 'Luna, Beagle',
+    poster: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&h=400&fit=crop',
+  },
+];
 
 const { data: reviews, error } = await supabase
   .from('reviews')
@@ -47,6 +59,22 @@ const ratingFilter = Astro.url.searchParams.get('rating') || 'all';
         )}
       </div>
     </section>
+
+    {videoTestimonials.length > 0 && (
+      <section class="container mx-auto px-4 py-12">
+        <h2 class="text-2xl font-semibold text-white mb-8">{t.reviews?.videoCredits ?? 'Testimonios en video'}</h2>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {videoTestimonials.map((video) => (
+            <VideoTestimonial
+              videoUrl={video.videoUrl}
+              author={video.author}
+              pet={video.pet}
+              poster={video.poster}
+            />
+          ))}
+        </div>
+      </section>
+    )}
 
     <section class="container mx-auto px-4 py-12">
       <div class="flex flex-wrap items-center justify-between gap-4 mb-8">

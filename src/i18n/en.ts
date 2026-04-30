@@ -32,6 +32,10 @@ export const en = {
     subtitle: 'Discover our furry friends showing off',
     instagram: 'Follow us on Instagram to see everything about Homies!',
   },
+  instagramFeed: {
+    heading: 'Follow Us on Instagram',
+    subtitle: 'Follow us to see more from Homies',
+  },
   faq: {
     heading: 'How does it work?',
     subtitle: 'The process is very simple:',
@@ -57,6 +61,17 @@ export const en = {
     subtitle: 'Schedule today and give your pet the care they deserve. New clients receive 15% off their first pet sitting service!',
     bookNow: 'Book now',
     phone: 'Call us',
+  },
+  availabilityCounter: {
+    available: 'Available caregivers',
+  },
+  newsletter: {
+    title: 'Subscribe to our newsletter!',
+    subtitle: 'Get exclusive offers, pet care tips, and the latest news from Homies.',
+    placeholder: 'Your email address',
+    subscribe: 'Subscribe',
+    success: 'Thanks for subscribing!',
+    error: 'Failed to subscribe. Please try again.',
   },
   footer: {
     hours: 'Hours',
@@ -182,6 +197,8 @@ export const en = {
     leaveReviewBtn: 'Leave review',
     service: 'Service',
     caregiver: 'Caregiver',
+    videoCredits: 'Video Testimonials',
+    videoBy: 'Video by',
   },
   dashboard: {
     welcome: 'Welcome back',
@@ -432,6 +449,19 @@ export const en = {
     trajectory: 'Reliable Track Record',
     trajectoryDesc: 'With a proven history, we ensure your pets are in expert and caring hands.',
   },
+  blog: {
+    heading: 'Tips Blog',
+    subtitle: 'Advice and guides for caring for your pets',
+    pageTitle: 'Tips Blog',
+    seeAll: 'View all posts',
+    back: 'Back to blog',
+  },
+  beforeAfter: {
+    heading: 'Before & After',
+    subtitle: 'Transformations from our services',
+    before: 'Before',
+    after: 'After',
+  },
   common: {
     loading: 'Loading...',
     error: 'Error',
@@ -461,5 +491,27 @@ export const en = {
     caregiver: 'Caregiver',
     client: 'Client',
     user: 'User',
+  },
+  coverage: {
+    title: 'Coverage Area',
+    subtitle: 'We are located in Antigua Guatemala and offer services in the following areas:',
+    zonesTitle: 'Our Zones',
+    center: 'Center',
+    centerDesc: 'Antigua Guatemala',
+    jocotenango: 'Jocotenango',
+    jocotenangoDesc: '5 km',
+    ciudadVieja: 'Ciudad Vieja',
+    ciudadViejaDesc: '8 km',
+    ctaText: 'Book now and receive a discount',
+    note: 'Not sure if we cover your area? Contact us and we\'ll help you.',
+    getDirections: 'View on Google Maps',
+  },
+  pricing: {
+    discountBadge: 'Discount available',
+    walks5Plus: '5+ walks = 10% off',
+    weekly7Plus: 'Weekly booking (7+) = 15% off',
+    pets2Plus: '2+ pets = 20% combo off',
+    discountApplied: 'Discount applied',
+    noDiscount: 'No discount',
   },
 }

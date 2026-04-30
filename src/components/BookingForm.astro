@@ -2,12 +2,15 @@
 import { services } from '../data/site'
 import { supabase } from '../lib/supabase'
 import type { Pet } from '../lib/types'
+import { getTranslations } from '@/i18n'
 
 interface Props {
   class?: string
 }
 
 const { class: className = '' } = Astro.props
+const locale = Astro.currentLocale || 'es'
+const t = getTranslations(locale)
 
 const serviceList = services.slice(0, 6)
 ---
@@ -42,10 +45,15 @@ const serviceList = services.slice(0, 6)
           {serviceList.map((service, index) => (
             <button
               type="button"
-              class="service-card group p-4 rounded-xl border-2 border-dark-200 bg-dark-300 hover:border-accent transition-all duration-300 text-left"
+              class="service-card group p-4 rounded-xl border-2 border-dark-200 bg-dark-300 hover:border-accent transition-all duration-300 text-left relative"
               data-service-index={index}
               data-service-id={index}
             >
+              {(service.popular || service.name === 'Dog Walks') && (
+                <span class="absolute left-4 top-4 z-10 rounded-full bg-accent-500 px-3 py-1 text-xs font-medium text-white">
+                  {t.pricing.discountBadge}
+                </span>
+              )}
               <div class="aspect-video w-full mb-3 rounded-lg overflow-hidden">
                 <img src={service.image} alt={service.name} class="w-full h-full object-cover" loading="lazy" />
               </div>
@@ -137,6 +145,14 @@ const serviceList = services.slice(0, 6)
           <label class="block text-sm text-gray-300 mb-2">Notes / Special Instructions</label>
           <textarea id="pet-notes" name="notes" rows="3" placeholder="Any special needs, behavior notes, or care instructions..." class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white placeholder-gray-500 focus:border-accent focus:outline-none resize-none"></textarea>
         </div>
+        <div class="mt-4">
+          <label class="block text-sm text-gray-300 mb-2">Number of Pets <span class="text-gray-500">(for combo discount)</span></label>
+          <input type="number" id="pet-count" name="pet_count" min="1" value="1" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none" />
+          <p class="mt-2 text-xs text-gray-400">{t.pricing.pets2Plus}</p>
+        </div>
+        <div id="discount-info" class="mt-4 p-3 bg-accent-500/10 border border-accent-500/30 rounded-lg hidden">
+          <p id="discount-text" class="text-sm text-accent-400"></p>
+        </div>
         <div class="mt-6 flex justify-between">
           <button type="button" class="back-btn px-6 py-3 bg-dark-200 text-white rounded-lg font-semibold hover:bg-dark-100 transition-colors" data-goto="2">
             Back
@@ -186,6 +202,10 @@ const serviceList = services.slice(0, 6)
             <div class="flex justify-between items-center">
               <span class="text-lg font-bold text-white">Total Price:</span>
               <span id="confirm-total-price" class="text-2xl font-bold text-accent">Q.0</span>
+            </div>
+            <div id="confirm-discount-row" class="flex justify-between items-center mt-2 hidden">
+              <span class="text-sm text-gray-400">Discount:</span>
+              <span id="confirm-discount" class="text-sm font-semibold text-green-400">-</span>
             </div>
           </div>
         </div>
@@ -254,9 +274,13 @@ interface BookingState {
   startDate: string
   endDate: string
   totalPrice: number
+  originalPrice: number
+  discount: number
+  discountReason: string
   petId: string
   newPet: { name: string; type: string; size: string } | null
   notes: string
+  petCount: number
 }
 
 const state: BookingState = {
@@ -265,9 +289,13 @@ const state: BookingState = {
   startDate: '',
   endDate: '',
   totalPrice: 0,
+  originalPrice: 0,
+  discount: 0,
+  discountReason: '',
   petId: '',
   newPet: null,
   notes: '',
+  petCount: 1,
 }
 
 const formContainer = document.querySelector('.booking-form-container') as HTMLElement
@@ -318,12 +346,53 @@ function calculatePrice() {
   const diffTime = Math.abs(end.getTime() - start.getTime())
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
 
+  let basePrice = 0
   if (state.selectedService.data.price.includes('/noche') || state.selectedService.data.price.includes('/día')) {
-    return pricePerUnit * diffDays
+    basePrice = pricePerUnit * diffDays
   } else if (state.selectedService.data.price.includes('/hora')) {
-    return pricePerUnit * diffDays * 8
+    basePrice = pricePerUnit * diffDays * 8
+  } else {
+    basePrice = pricePerUnit
   }
-  return pricePerUnit
+
+  state.originalPrice = basePrice
+  state.discount = 0
+  state.discountReason = ''
+
+  if (state.selectedService.data.name === 'Dog Walks' && diffDays >= 5) {
+    state.discount = 0.10
+    state.discountReason = '5+ walks = 10% off'
+  }
+  if (diffDays >= 7) {
+    state.discount = Math.max(state.discount, 0.15)
+    state.discountReason = 'Weekly booking = 15% off'
+  }
+  if (state.petCount >= 2) {
+    state.discount = Math.max(state.discount, 0.20)
+    state.discountReason = '2+ pets combo = 20% off'
+  }
+
+  if (state.discount > 0) {
+    state.totalPrice = Math.round(basePrice * (1 - state.discount))
+  } else {
+    state.totalPrice = basePrice
+  }
+
+  return state.totalPrice
+}
+
+function showDiscountInfo() {
+  const discountInfo = document.getElementById('discount-info')
+  const discountText = document.getElementById('discount-text')
+  if (discountInfo && discountText) {
+    if (state.discount > 0) {
+      discountInfo.classList.remove('hidden')
+      const savings = state.originalPrice - state.totalPrice
+      discountText.textContent = `${state.discountReason} (-Q.${savings})`
+    } else {
+      discountInfo.classList.add('hidden')
+    }
+  }
 }
 
 function selectService(index: number) {
@@ -397,6 +466,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `${Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} days`
         : '1 day'
       document.getElementById('selected-total-price')!.textContent = `Q.${state.totalPrice}`
+      if (state.discount > 0) {
+        document.getElementById('selected-total-price')!.classList.add('line-through', 'text-gray-500')
+        const discountedSpan = document.createElement('span')
+        discountedSpan.id = 'selected-discounted-price'
+        discountedSpan.className = 'text-xl font-bold text-accent'
+        discountedSpan.textContent = `Q.${state.totalPrice}`
+        const parent = document.getElementById('selected-total-price')!.parentElement
+        if (parent) {
+          parent.appendChild(document.createTextNode(' '))
+          parent.appendChild(discountedSpan)
+        }
+      }
     }
 
     showStep(3)
@@ -434,6 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     state.notes = (document.getElementById('pet-notes') as HTMLTextAreaElement).value
+    state.petCount = parseInt((document.getElementById('pet-count') as HTMLInputElement).value) || 1
+    state.totalPrice = calculatePrice()
+    showDiscountInfo()
 
     showStep(4)
     updateConfirmationStep()
@@ -471,7 +555,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('confirm-total-price')!.textContent = `Q.${state.totalPrice}`
+
+    const discountRow = document.getElementById('confirm-discount-row')
+    const discountEl = document.getElementById('confirm-discount')
+    if (discountRow && discountEl) {
+      if (state.discount > 0) {
+        discountRow.classList.remove('hidden')
+        const savings = state.originalPrice - state.totalPrice
+        discountEl.textContent = `-Q.${savings} (${state.discountReason})`
+      } else {
+        discountRow.classList.add('hidden')
+      }
+    }
   }
+
+  document.getElementById('pet-count')?.addEventListener('change', (e) => {
+    state.petCount = parseInt((e.target as HTMLInputElement).value) || 1
+    state.totalPrice = calculatePrice()
+    showDiscountInfo()
+  })
 
   document.querySelectorAll('.back-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
