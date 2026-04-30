@@ -96,6 +96,18 @@ messages (
   read_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT now()
 )
+
+-- Garantía de Seguridad (contenido homepage)
+security_features (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  icon TEXT NOT NULL DEFAULT 'shield',
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+)
 ```
 
 ---

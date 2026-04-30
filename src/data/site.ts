@@ -48,6 +48,12 @@ export interface FAQ {
   answer: string;
 }
 
+export interface SecurityFeature {
+  title: string;
+  description: string;
+  icon: string;
+}
+
 // Site metadata
 export const site = {
   name: 'Homies Pets',
@@ -365,37 +371,76 @@ export const about = {
     'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=800&h=600&fit=crop',
 };
 
+// Security Guarantee
+export const securityGuarantee = {
+  title: 'Garantía de Seguridad',
+  subtitle: 'Tu tranquilidad es nuestra prioridad. Por eso implementamos rigurosos protocolos de seguridad en cada servicio.',
+};
+
+export const securityFeatures: SecurityFeature[] = [
+  {
+    title: 'Identidad Verificada',
+    description: 'Todos nuestros cuidadores pasan por un proceso de verificación de identidad con documentos oficiales y revisión de antecedentes.',
+    icon: 'shield',
+  },
+  {
+    title: 'Seguro de Cobertura',
+    description: 'Contamos con seguro que cubre incidentes durante el servicio, protegiendo a tu mascota, tu hogar y al cuidador.',
+    icon: 'umbrella',
+  },
+  {
+    title: 'Protocolo de Emergencia',
+    description: 'Tenemos un plan de acción claro ante cualquier eventualidad: contacto inmediato, veterinario de confianza y seguimiento 24/7.',
+    icon: 'alert-circle',
+  },
+  {
+    title: 'Pagos Seguros',
+    description: 'Todas las transacciones se procesan a través de la plataforma con encriptación SSL. Nunca compartas datos bancarios directamente.',
+    icon: 'lock',
+  },
+];
+
 // FAQ
 export const faqs: FAQ[] = [
   {
-    question: 'Crea una cuenta en nuestra plataforma',
+    question: '¿Qué pasa si mi mascota se enferma durante el servicio?',
     answer:
-      'Crearás un usuario y una contraseña para acceder a tu perfil, utilizando tu correo electrónico',
+      'Contamos con un protocolo de emergencia claro: el Homie te contactará de inmediato y, si es necesario, llevará a tu mascota al veterinario de tu confianza o al más cercano. Todos nuestros cuidadores están capacitados para detectar signos de alerta y actuar con rapidez.',
   },
   {
-    question: 'Confirma tu correo electrónico',
+    question: '¿Puedo conocer al cuidador antes de contratar el servicio?',
     answer:
-      'Te llegará un correo de confirmación para verificar tu dirección de email. Haz clic en el enlace proporcionado para activar tu cuenta.',
+      '¡Por supuesto! Puedes solicitar una reunión previa (virtual o presencial) para que tú y tu mascota conozcan al Homie. Esto ayuda a generar confianza y asegurar que ambos se sientan cómodos antes del servicio.',
   },
   {
-    question: 'Completa tu perfil con la información requerida',
+    question: '¿Cómo funcionan los pagos? ¿Son seguros?',
     answer:
-      'Incluye tu nombre, dirección, número de teléfono y una foto de perfil. Esto ayudará a los proveedores a conocerte mejor y a generar confianza.',
+      'Los pagos se realizan a través de la plataforma con métodos seguros. No necesitas entregar efectivo directamente al cuidador. Recibirás un comprobante digital y puedes pagar con tarjeta o transferencia bancaria.',
   },
   {
-    question: 'Explora los servicios disponibles y elige el que necesites',
+    question: '¿Cómo sé que mi mascota está bien mientras estoy fuera?',
     answer:
-      'Selecciona el servicio que deseas solicitar, revisa los detalles y asegúrate de que se ajuste a tus necesidades y las de tu mascota.',
+      'Nuestros Homies envían actualizaciones periódicas con fotos y mensajes sobre el estado de tu mascota. También puedes coordinar videollamadas o contactar directamente al cuidador a través de nuestro sistema de mensajería segura.',
   },
   {
-    question: 'Realiza tu reserva o solicitud de servicio',
+    question: '¿Puedo contratar para varias mascotas al mismo tiempo?',
     answer:
-      'Ten en cuenta que algunos servicios pueden requerir información adicional sobre tu mascota, como su tamaño, raza o necesidades especiales. Proporciona esta información para asegurar una experiencia personalizada.',
+      'Sí. Ofrecemos descuentos especiales cuando contratas para 2 o más mascotas. El Homie asignado tendrá la experiencia necesaria para cuidar a todos tus amigos peludos simultáneamente.',
   },
   {
-    question: 'Disfruta de nuestros servicios y deja tu valoración',
+    question: '¿Qué pasa si necesito cancelar o cambiar fechas?',
     answer:
-      'Después de que tu mascota haya disfrutado de nuestros servicios, te invitamos a dejar una reseña y calificación para ayudar a otros usuarios a tomar decisiones informadas y para que podamos seguir mejorando.',
+      'Puedes cancelar o modificar tu reserva sin costo hasta 24 horas antes del servicio. Para cancelaciones de última hora, aplicamos una política justa que protege tanto al cliente como al cuidador. Consulta los detalles en tu panel de reservas.',
+  },
+  {
+    question: '¿Los cuidadores tienen identidad verificada?',
+    answer:
+      'Sí. Todos nuestros Homies pasan por un proceso de verificación de identidad con documentos oficiales. Además, revisamos sus antecedentes y validamos sus referencias para garantizar la máxima seguridad para tu hogar y tu mascota.',
+  },
+  {
+    question: '¿Qué áreas cubren sus servicios?',
+    answer:
+      'Actualmente operamos en Antigua Guatemala, Jocotenango y Ciudad Vieja. Si no estás seguro de si cubrimos tu zona, contáctanos y con gusto te confirmamos la disponibilidad.',
   },
 ];
 

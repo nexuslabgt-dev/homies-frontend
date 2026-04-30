@@ -37,9 +37,9 @@ export const es = {
     subtitle: 'Síguenos para ver más de Homies',
   },
   faq: {
-    heading: '¿Cómo funciona?',
-    subtitle: 'El proceso es muy sencillo:',
-    contact: '¿Tienes preguntas?',
+    heading: 'Preguntas Frecuentes',
+    subtitle: 'Resolvemos tus dudas para que contrates con total confianza:',
+    contact: '¿Tienes más preguntas?',
     contactDesc: 'Nos encantaría ayudarte. No dudes en contactarnos para cualquier consulta o para obtener más información sobre nuestros servicios.',
     contactCta: 'Contáctanos',
   },

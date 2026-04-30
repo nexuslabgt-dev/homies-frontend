@@ -16,3 +16,9 @@ dist/
 # Environment
 .env
 .env.local
+
+# Symlinks to external config
+.agents
+.codex
+opencode.json
+skills-lock.json
