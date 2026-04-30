@@ -2,7 +2,8 @@
 import { getTranslations } from '@/i18n';
 import { faqs } from '@/data/site';
 
-const t = getTranslations(Astro.currentLocale || 'es');
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 
 interface Props {
   title?: string;
@@ -57,7 +58,7 @@ const {
         <p class="mt-2 text-gray-600 dark:text-gray-400">
           {t.faq.contactDesc}
         </p>
-        <a href="/contact" class="btn-primary mt-4">
+        <a href={`/${locale}/contact`} class="btn-primary mt-4">
           {t.faq.contactCta}
         </a>
       </div>

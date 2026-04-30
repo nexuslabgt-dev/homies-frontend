@@ -33,14 +33,14 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
             View and manage your service bookings.
           </p>
         </div>
-        <a href="/contact" class="btn-primary">
+        <a href="/en/contact" class="btn-primary">
           New Booking
         </a>
       </div>
 
       <div class="mb-6 flex flex-wrap gap-2">
         <a
-          href="/dashboard/bookings"
+          href="/en/dashboard/bookings"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'all'
               ? 'bg-primary-600 text-white'
@@ -50,7 +50,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           All
         </a>
         <a
-          href="/dashboard/bookings?status=pending"
+          href="/en/dashboard/bookings?status=pending"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'pending'
               ? 'bg-primary-600 text-white'
@@ -60,7 +60,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           Pending
         </a>
         <a
-          href="/dashboard/bookings?status=confirmed"
+          href="/en/dashboard/bookings?status=confirmed"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'confirmed'
               ? 'bg-primary-600 text-white'
@@ -70,7 +70,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           Confirmed
         </a>
         <a
-          href="/dashboard/bookings?status=completed"
+          href="/en/dashboard/bookings?status=completed"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'completed'
               ? 'bg-primary-600 text-white'
@@ -80,7 +80,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           Completed
         </a>
         <a
-          href="/dashboard/bookings?status=cancelled"
+          href="/en/dashboard/bookings?status=cancelled"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'cancelled'
               ? 'bg-primary-600 text-white'

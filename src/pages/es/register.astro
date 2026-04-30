@@ -1,9 +1,12 @@
 ---
 import Base from '@/layouts/Base.astro';
 import RegisterForm from '@/components/RegisterForm.astro';
+import { getTranslations } from '@/i18n';
+
+const t = getTranslations(Astro.currentLocale || 'es');
 ---
 
-<Base title="Create Account" headerVariant="dark">
+<Base title={t.register.title} headerVariant="dark">
   <section class="relative min-h-screen bg-primary-600 py-20 lg:py-28">
     <div class="absolute inset-0 overflow-hidden">
       <div class="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary-500 opacity-20 blur-3xl"></div>
@@ -14,10 +17,10 @@ import RegisterForm from '@/components/RegisterForm.astro';
       <div class="flex flex-col items-center justify-center">
         <div class="mb-8 text-center" data-animate>
           <h1 class="font-serif text-4xl font-bold text-white sm:text-5xl">
-            Join Homies
+            {t.register.title}
           </h1>
           <p class="mx-auto mt-4 max-w-md text-lg text-primary-100">
-            Create an account to book appointments for your furry friends
+            {t.register.subtitle}
           </p>
         </div>
 
@@ -29,12 +32,12 @@ import RegisterForm from '@/components/RegisterForm.astro';
           <RegisterForm />
 
           <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?
+            {t.register.login}
             <a
-              href="/login"
+              href="/es/login"
               class="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
             >
-              Sign in
+              {t.register.loginLink}
             </a>
           </p>
         </div>

@@ -1,6 +1,7 @@
 ---
 import { getTranslations } from '@/i18n';
 import { site, nav, header } from '@/data/site';
+import LanguageSwitcher from '@/components/LanguageSwitcher.astro';
 
 const t = getTranslations(Astro.currentLocale || 'es');
 
@@ -91,6 +92,8 @@ const isDark = variant === 'dark';
           </button>
         )
       }
+
+      <LanguageSwitcher />
 
       {
         header.cta && (

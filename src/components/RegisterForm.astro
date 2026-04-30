@@ -123,10 +123,14 @@
   const errorDiv = document.getElementById('error-message') as HTMLDivElement;
   const googleBtn = document.getElementById('google-signup') as HTMLButtonElement;
 
+  function getLocale() {
+    return window.location.pathname.split('/')[1] || 'es';
+  }
+
   async function checkSession() {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
-      window.location.href = '/dashboard';
+      window.location.href = '/' + getLocale() + '/dashboard';
     }
   }
 
@@ -158,7 +162,7 @@
       errorDiv.textContent = error.message;
       errorDiv.classList.remove('hidden');
     } else {
-      window.location.href = '/dashboard';
+      window.location.href = '/' + getLocale() + '/dashboard';
     }
   });
 

@@ -1,9 +1,12 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { supabase } from '@/lib/supabase';
+import { getTranslations } from '@/i18n';
+
+const t = getTranslations(Astro.currentLocale || 'es');
 
 const { data: { session } } = await supabase.auth.getSession();
-if (!session) return Astro.redirect('/login');
+if (!session) return Astro.redirect('/es/login');
 
 const { data: existingCaregiver } = await supabase
   .from('caregivers')
@@ -11,7 +14,7 @@ const { data: existingCaregiver } = await supabase
   .eq('user_id', session.user.id)
   .single();
 
-if (existingCaregiver) return Astro.redirect('/caregiver/dashboard');
+if (existingCaregiver) return Astro.redirect('/es/caregiver/dashboard');
 
 const { data: services } = await supabase
   .from('services')
@@ -19,15 +22,15 @@ const { data: services } = await supabase
   .order('name');
 ---
 
-<Base title="Caregiver Registration" headerVariant="dark">
+<Base title={t.caregiver.register} headerVariant="dark">
   <section class="min-h-screen bg-gray-50 dark:bg-gray-950 py-12">
     <div class="container mx-auto px-4 lg:px-8 max-w-2xl">
       <div class="mb-8">
         <h1 class="font-serif text-3xl font-bold text-gray-900 dark:text-white">
-          Become a Caregiver
+          {t.caregiver.becomeCaregiver}
         </h1>
         <p class="mt-1 text-gray-600 dark:text-gray-400">
-          Join our network of trusted pet caregivers
+          {t.caregiver.registerSubtitle}
         </p>
       </div>
 
@@ -36,27 +39,27 @@ const { data: services } = await supabase
 
         <div class="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-900">
           <h2 class="font-serif text-xl font-bold text-gray-900 dark:text-white mb-6">
-            About You
+            {t.caregiver.aboutYou}
           </h2>
 
           <div class="space-y-4">
             <div>
               <label for="bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Bio
+                {t.caregiver.bio}
               </label>
               <textarea
                 id="bio"
                 name="bio"
                 rows="4"
                 required
-                placeholder="Tell clients about yourself and your experience with pets..."
+                placeholder={t.caregiver.bioPlaceholder}
                 class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               ></textarea>
             </div>
 
             <div>
               <label for="experience" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Experience (years)
+                {t.caregiver.experience}
               </label>
               <input
                 type="number"
@@ -74,11 +77,11 @@ const { data: services } = await supabase
 
         <div class="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-900">
           <h2 class="font-serif text-xl font-bold text-gray-900 dark:text-white mb-6">
-            Services Offered
+            {t.caregiver.servicesOffered}
           </h2>
 
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Select the services you would like to offer
+            {t.caregiver.servicesDesc}
           </p>
 
           <div class="grid gap-3 sm:grid-cols-2">
@@ -98,12 +101,12 @@ const { data: services } = await supabase
 
         <div class="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-900">
           <h2 class="font-serif text-xl font-bold text-gray-900 dark:text-white mb-6">
-            Pricing
+            {t.caregiver.pricing}
           </h2>
 
           <div>
             <label for="hourly_rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Hourly Rate ($)
+              {t.caregiver.hourlyRate}
             </label>
             <input
               type="number"
@@ -112,7 +115,7 @@ const { data: services } = await supabase
               min="1"
               step="0.01"
               required
-              placeholder="25.00"
+              placeholder={t.caregiver.hourlyRatePlaceholder}
               class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
@@ -122,7 +125,7 @@ const { data: services } = await supabase
           type="submit"
           class="w-full rounded-lg bg-primary-600 px-6 py-3 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
         >
-          Complete Registration
+          {t.caregiver.submit}
         </button>
       </form>
     </div>

@@ -1,6 +1,10 @@
 ---
 import { supabase } from '../lib/supabase'
 import type { Message, Profile } from '../lib/types'
+import { getTranslations } from '@/i18n'
+
+const { locale = 'es' } = Astro.props
+const t = getTranslations(locale)
 
 const { data: { session } } = await supabase.auth.getSession()
 const user = session?.user
@@ -49,7 +53,7 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
   <button
     id="chat-toggle"
     class="bg-primary-500 hover:bg-primary-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 relative"
-    aria-label="Abrir chat"
+    aria-label={t.chat.openChat}
   >
     <svg id="chat-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -68,7 +72,7 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
     class="bg-gray-900 rounded-2xl shadow-2xl w-80 sm:w-96 max-h-[500px] flex flex-col overflow-hidden border border-gray-700 hidden"
   >
     <div id="panel-header" class="bg-gray-800 px-4 py-3 flex items-center justify-between border-b border-gray-700">
-      <h3 class="text-white font-semibold">Mensajes</h3>
+      <h3 class="text-white font-semibold">{t.chat.title}</h3>
     </div>
 
     <div id="auth-message" class="flex-1 flex flex-col items-center justify-center p-6 text-center hidden">
@@ -77,9 +81,9 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
         </svg>
       </div>
-      <p class="text-gray-300 mb-4">Inicia sesión para chatear</p>
+      <p class="text-gray-300 mb-4">{t.chat.loginPrompt}</p>
       <a href="/login" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-        Iniciar Sesión
+        {t.chat.login}
       </a>
     </div>
 
@@ -90,7 +94,7 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
           </svg>
         </div>
-        <p class="text-gray-400">No hay conversaciones aún</p>
+        <p class="text-gray-400">{t.chat.noConversations}</p>
       </div>
     </div>
 
@@ -103,12 +107,12 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
           <input
             type="text"
             id="message-input"
-            placeholder="Escribe un mensaje..."
+            placeholder={t.chat.placeholder}
             class="flex-1 bg-gray-700 text-white placeholder-gray-400 px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 border-none"
           />
           <button
             type="submit"
-            class="bg-primary-500 hover:bg-primary-600 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 disabled:bg-gray-600 disabled:cursor-not-allowed"
+            class="bg-primary-500 hover:bg-primary-600 text-white w-11 h-11 rounded-full flex items-center justify-center transition-colors flex-shrink-0 disabled:bg-gray-600 disabled:cursor-not-allowed"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
@@ -120,7 +124,7 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
   </div>
 </div>
 
-<script define:vars={{ user: user ? { id: user.id, email: user.email } : null, supabaseUrl: import.meta.env.SUPABASE_URL }}>
+<script define:vars={{ user: user ? { id: user.id, email: user.email } : null, supabaseUrl: import.meta.env.SUPABASE_URL, chatT: t.chat, locale, commonUser: t.common.user }}>
   const userId = user?.id || null;
 
   let isOpen = false;
@@ -227,10 +231,10 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
-            <span class="text-white font-medium truncate">${conv.profile?.full_name || 'Usuario'}</span>
+            <span class="text-white font-medium truncate">${conv.profile?.full_name || commonUser}</span>
             <span class="text-gray-500 text-xs">${formatTime(conv.last_message?.created_at)}</span>
           </div>
-          <p class="text-gray-400 text-sm truncate">${conv.last_message?.sender_id === userId ? 'Tú: ' : ''}${conv.last_message?.content || ''}</p>
+          <p class="text-gray-400 text-sm truncate">${conv.last_message?.sender_id === userId ? chatT.you + ': ' : ''}${conv.last_message?.content || ''}</p>
         </div>
         ${conv.unread_count > 0 ? `<span class="bg-primary-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">${conv.unread_count}</span>` : ''}
       `;
@@ -289,7 +293,7 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
     activeConversation = null;
     messagesView.classList.add('hidden');
     conversationsList.classList.remove('hidden');
-    panelHeader.innerHTML = '<h3 class="text-white font-semibold">Mensajes</h3>';
+    panelHeader.innerHTML = '<h3 class="text-white font-semibold">' + chatT.title + '</h3>';
 
     if (conversations.length === 0) {
       noConversations.classList.remove('hidden');
@@ -422,11 +426,11 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return 'Ahora';
+    if (minutes < 1) return chatT.now;
     if (minutes < 60) return `${minutes}m`;
     if (hours < 24) return `${hours}h`;
     if (days < 7) return `${days}d`;
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    return date.toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US', { day: 'numeric', month: 'short' });
   }
 
   document.addEventListener('DOMContentLoaded', init);

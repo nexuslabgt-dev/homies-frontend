@@ -214,7 +214,7 @@ const serviceList = services.slice(0, 6)
             <p id="booking-reference" class="text-xl font-bold text-accent">-</p>
           </div>
           <div class="mt-8">
-            <a href="/dashboard" class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
+            <a id="view-bookings-link" href="/es/dashboard" class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
               View My Bookings
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -456,13 +456,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.petId) {
       supabase
         .from('pets')
-        .select('name, type, size')
+        .select('name, species')
         .eq('id', state.petId)
         .single()
         .then(({ data: pet }) => {
           if (pet) {
             document.getElementById('confirm-pet-name')!.textContent = pet.name || '-'
-            document.getElementById('confirm-pet-info')!.textContent = `${pet.type} / ${pet.size}`
+            document.getElementById('confirm-pet-info')!.textContent = pet.species || '-'
           }
         })
     } else if (state.newPet) {
@@ -488,20 +488,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         alert('Please sign in to make a booking')
-        window.location.href = '/login'
+        const locale = window.location.pathname.split('/')[1] || 'es'
+        window.location.href = `/${locale}/login`
         return
       }
 
       let petId = state.petId
 
-      if (state.newPet && !petId) {
+        if (state.newPet && !petId) {
         const { data: newPetData, error: petError } = await supabase
           .from('pets')
           .insert({
             owner_id: session.user.id,
             name: state.newPet.name,
-            type: state.newPet.type as 'dog' | 'cat' | 'bird' | 'other',
-            size: state.newPet.size as 'small' | 'medium' | 'large',
+            species: state.newPet.type,
             notes: state.notes,
           })
           .select()
@@ -511,27 +511,32 @@ document.addEventListener('DOMContentLoaded', () => {
         petId = newPetData.id
       }
 
-      const serviceNameMap: Record<string, string> = {
-        'Pet Sitting': 'pet_sitting',
-        'Daycare': 'daycare',
-        'Homestay': 'homestay',
-        'Dog Walks': 'dog_walks',
-        'Home Visits': 'home_visits',
-        'Photography': 'photography',
-      }
-
-      const serviceDbName = state.selectedService ? serviceNameMap[state.selectedService.data.name] : null
+      const serviceName = state.selectedService ? state.selectedService.data.name : null
 
       const { data: servicesData } = await supabase
         .from('services')
         .select('id')
-        .eq('name', serviceDbName || '')
+        .eq('name', serviceName || '')
         .single()
+
+      const { data: caregiversData } = await supabase
+        .from('caregivers')
+        .select('id')
+        .eq('is_available', true)
+        .contains('services', [serviceName])
+        .limit(1)
+
+      const caregiverId = caregiversData?.[0]?.id
+
+      if (!caregiverId) {
+        throw new Error('No caregiver available for this service')
+      }
 
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
         .insert({
           client_id: session.user.id,
+          caregiver_id: caregiverId,
           service_id: servicesData?.id || null,
           pet_id: petId,
           start_date: state.startDate,

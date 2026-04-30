@@ -1,6 +1,9 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { supabase } from '@/lib/supabase';
+import { getTranslations } from '@/i18n';
+
+const t = getTranslations(Astro.currentLocale || 'es');
 
 const { data: { session } } = await supabase.auth.getSession();
 if (!session) return Astro.redirect('/login');
@@ -21,73 +24,73 @@ const { data: bookings } = await supabase
 const statusFilter = Astro.url.searchParams.get('status') || 'all';
 ---
 
-<Base title="My Bookings" headerVariant="dark">
+<Base title={t.dashboardBookings.title} headerVariant="dark">
   <section class="min-h-screen bg-gray-50 dark:bg-gray-950 py-12">
     <div class="container mx-auto px-4 lg:px-8">
       <div class="mb-8 flex items-center justify-between">
         <div>
           <h1 class="font-serif text-3xl font-bold text-gray-900 dark:text-white">
-            My Bookings
+            {t.dashboardBookings.title}
           </h1>
           <p class="mt-1 text-gray-600 dark:text-gray-400">
-            View and manage your service bookings.
+            {t.dashboardBookings.subtitle}
           </p>
         </div>
-        <a href="/contact" class="btn-primary">
-          New Booking
+        <a href="/es/contact" class="btn-primary">
+          {t.dashboardBookings.newBooking}
         </a>
       </div>
 
       <div class="mb-6 flex flex-wrap gap-2">
         <a
-          href="/dashboard/bookings"
+          href="/es/dashboard/bookings"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'all'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          All
+          {t.dashboardBookings.all}
         </a>
         <a
-          href="/dashboard/bookings?status=pending"
+          href="/es/dashboard/bookings?status=pending"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'pending'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          Pending
+          {t.dashboardBookings.pending}
         </a>
         <a
-          href="/dashboard/bookings?status=confirmed"
+          href="/es/dashboard/bookings?status=confirmed"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'confirmed'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          Confirmed
+          {t.dashboardBookings.confirmed}
         </a>
         <a
-          href="/dashboard/bookings?status=completed"
+          href="/es/dashboard/bookings?status=completed"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'completed'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          Completed
+          {t.dashboardBookings.completed}
         </a>
         <a
-          href="/dashboard/bookings?status=cancelled"
+          href="/es/dashboard/bookings?status=cancelled"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'cancelled'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          Cancelled
+          {t.dashboardBookings.cancelled}
         </a>
       </div>
 
@@ -98,25 +101,25 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
               <thead class="bg-gray-50 dark:bg-gray-800">
                 <tr>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Service
+                    {t.dashboardBookings.service}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Pet
+                    {t.dashboardBookings.pet}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Caregiver
+                    {t.dashboardBookings.caregiver}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Dates
+                    {t.dashboardBookings.dates}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Price
+                    {t.dashboardBookings.price}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Status
+                    {t.dashboardBookings.status}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Actions
+                    {t.dashboardBookings.actions}
                   </th>
                 </tr>
               </thead>
@@ -127,59 +130,59 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                     <tr>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="font-medium text-gray-900 dark:text-white">
-                          {booking.services?.name ?? 'Service'}
+                          {booking.services?.name ?? t.common.service}
                         </p>
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                          {booking.pets?.name ?? 'N/A'}
+                          {booking.pets?.name ?? t.common.na}
                         </p>
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                          {booking.caregivers?.profiles?.full_name ?? 'TBD'}
+                          {booking.caregivers?.profiles?.full_name ?? t.common.tbd}
                         </p>
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                          {booking.start_date ? new Date(booking.start_date).toLocaleDateString() : 'TBD'}
+                          {booking.start_date ? new Date(booking.start_date).toLocaleDateString() : t.common.tbd}
                         </p>
                         {booking.end_date && (
                           <p class="text-sm text-gray-500 dark:text-gray-500">
-                            to {new Date(booking.end_date).toLocaleDateString()}
+                            a {new Date(booking.end_date).toLocaleDateString()}
                           </p>
                         )}
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                          {booking.total_price ? `$${(booking.total_price / 100).toFixed(2)}` : 'TBD'}
+                          {booking.total_price ? `$${(booking.total_price / 100).toFixed(2)}` : t.common.tbd}
                         </p>
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         {booking.status === 'pending' && (
                           <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                            Pending
+                            {t.dashboardBookings.pending}
                           </span>
                         )}
                         {booking.status === 'confirmed' && (
                           <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                            Confirmed
+                            {t.dashboardBookings.confirmed}
                           </span>
                         )}
                         {booking.status === 'completed' && (
                           <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                            Completed
+                            {t.dashboardBookings.completed}
                           </span>
                         )}
                         {booking.status === 'cancelled' && (
                           <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                            Cancelled
+                            {t.dashboardBookings.cancelled}
                           </span>
                         )}
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <button class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
-                          View
+                          {t.dashboardBookings.view}
                         </button>
                       </td>
                     </tr>
@@ -192,9 +195,9 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No bookings found</h3>
+            <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">{t.dashboardBookings.noBookings}</h3>
             <p class="mt-2 text-gray-600 dark:text-gray-400">
-              {statusFilter !== 'all' ? `No ${statusFilter} bookings.` : 'Book your first service today.'}
+              {statusFilter !== 'all' ? t.dashboardBookings.noFilteredBookings.replace('{status}', statusFilter) : t.dashboardBookings.noBookingsDesc}
             </p>
           </div>
         )}

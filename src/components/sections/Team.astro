@@ -2,7 +2,8 @@
 import { getTranslations } from '@/i18n';
 import { team } from '@/data/site';
 
-const t = getTranslations(Astro.currentLocale || 'es');
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 
 interface Props {
   title?: string;
@@ -70,7 +71,7 @@ const displayTeam = showAll ? team : team.slice(0, 4);
           )}
           <div class="mt-4 flex flex-wrap justify-center gap-2">
             <a
-              href="/contact"
+              href={`/${locale}/contact`}
               class="inline-flex items-center justify-center rounded-full bg-primary-100 p-3 text-primary-600 transition hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
             >
               <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

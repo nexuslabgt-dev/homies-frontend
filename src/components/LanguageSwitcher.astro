@@ -3,7 +3,7 @@ import { getRelativeLocaleUrl } from 'astro:i18n'
 const currentLocale = Astro.currentLocale || 'es'
 ---
 <div class="flex items-center gap-2">
-  <a href={getRelativeLocaleUrl('es')} class:list={['px-2 py-1 text-sm rounded', currentLocale === 'es' ? 'bg-primary-500 text-white' : 'text-gray-400 hover:text-white']}>ES</a>
-  <span class="text-gray-600">|</span>
-  <a href={getRelativeLocaleUrl('en')} class:list={['px-2 py-1 text-sm rounded', currentLocale === 'en' ? 'bg-primary-500 text-white' : 'text-gray-400 hover:text-white']}>EN</a>
+  <a href={getRelativeLocaleUrl('es')} class:list={['px-2 py-1 text-sm rounded transition-colors', currentLocale === 'es' ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white']}>ES</a>
+  <span class="text-white/30">|</span>
+  <a href={getRelativeLocaleUrl('en')} class:list={['px-2 py-1 text-sm rounded transition-colors', currentLocale === 'en' ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white']}>EN</a>
 </div>

@@ -1,9 +1,12 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { supabase } from '@/lib/supabase';
+import { getTranslations } from '@/i18n';
+
+const t = getTranslations(Astro.currentLocale || 'es');
 
 const { data: { session } } = await supabase.auth.getSession();
-if (!session) return Astro.redirect('/login');
+if (!session) return Astro.redirect('/es/login');
 
 const { data: caregiver } = await supabase
   .from('caregivers')
@@ -11,7 +14,7 @@ const { data: caregiver } = await supabase
   .eq('user_id', session.user.id)
   .single();
 
-if (!caregiver) return Astro.redirect('/caregiver/register');
+if (!caregiver) return Astro.redirect('/es/caregiver/register');
 
 const { data: bookings } = await supabase
   .from('bookings')
@@ -22,78 +25,78 @@ const { data: bookings } = await supabase
 const statusFilter = Astro.url.searchParams.get('status') || 'all';
 ---
 
-<Base title="My Bookings" headerVariant="dark">
+<Base title={t.caregiverBookings.title} headerVariant="dark">
   <section class="min-h-screen bg-gray-50 dark:bg-gray-950 py-12">
     <div class="container mx-auto px-4 lg:px-8">
       <div class="mb-8">
         <h1 class="font-serif text-3xl font-bold text-gray-900 dark:text-white">
-          My Bookings
+          {t.caregiverBookings.title}
         </h1>
         <p class="mt-1 text-gray-600 dark:text-gray-400">
-          Manage your booking requests and assignments.
+          {t.caregiverBookings.subtitle}
         </p>
       </div>
 
       <div class="mb-6 flex flex-wrap gap-2">
         <a
-          href="/caregiver/bookings"
+          href="/es/caregiver/bookings"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'all'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          All
+          {t.caregiverBookings.all}
         </a>
         <a
-          href="/caregiver/bookings?status=pending"
+          href="/es/caregiver/bookings?status=pending"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'pending'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          Pending
+          {t.caregiverBookings.pending}
         </a>
         <a
-          href="/caregiver/bookings?status=confirmed"
+          href="/es/caregiver/bookings?status=confirmed"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'confirmed'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          Confirmed
+          {t.caregiverBookings.confirmed}
         </a>
         <a
-          href="/caregiver/bookings?status=in_progress"
+          href="/es/caregiver/bookings?status=in_progress"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'in_progress'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          In Progress
+          {t.caregiverBookings.inProgress}
         </a>
         <a
-          href="/caregiver/bookings?status=completed"
+          href="/es/caregiver/bookings?status=completed"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'completed'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          Completed
+          {t.caregiverBookings.completed}
         </a>
         <a
-          href="/caregiver/bookings?status=cancelled"
+          href="/es/caregiver/bookings?status=cancelled"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'cancelled'
               ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           }`}
         >
-          Cancelled
+          {t.caregiverBookings.cancelled}
         </a>
       </div>
 
@@ -104,25 +107,25 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
               <thead class="bg-gray-50 dark:bg-gray-800">
                 <tr>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Service
+                    {t.caregiverBookings.service}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Client
+                    {t.caregiverBookings.client}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Pet
+                    {t.caregiverBookings.pet}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Dates
+                    {t.caregiverBookings.dates}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Price
+                    {t.caregiverBookings.price}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Status
+                    {t.caregiverBookings.status}
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Actions
+                    {t.caregiverBookings.actions}
                   </th>
                 </tr>
               </thead>
@@ -133,12 +136,12 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                     <tr>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="font-medium text-gray-900 dark:text-white">
-                          {booking.service?.name ?? 'Service'}
+                          {booking.service?.name ?? t.common.service}
                         </p>
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                          {booking.client?.full_name ?? 'N/A'}
+                          {booking.client?.full_name ?? t.common.na}
                         </p>
                         {booking.client?.phone && (
                           <p class="text-sm text-gray-500 dark:text-gray-500">
@@ -148,7 +151,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                          {booking.pet?.name ?? 'N/A'}
+                          {booking.pet?.name ?? t.common.na}
                         </p>
                         {booking.pet?.species && (
                           <p class="text-sm text-gray-500 dark:text-gray-500">
@@ -158,43 +161,43 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                          {booking.start_date ? new Date(booking.start_date).toLocaleDateString() : 'TBD'}
+                          {booking.start_date ? new Date(booking.start_date).toLocaleDateString() : t.common.tbd}
                         </p>
                         {booking.end_date && (
                           <p class="text-sm text-gray-500 dark:text-gray-500">
-                            to {new Date(booking.end_date).toLocaleDateString()}
+                            a {new Date(booking.end_date).toLocaleDateString()}
                           </p>
                         )}
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                          {booking.total_price ? `$${(booking.total_price / 100).toFixed(2)}` : 'TBD'}
+                          {booking.total_price ? `$${(booking.total_price / 100).toFixed(2)}` : t.common.tbd}
                         </p>
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         {booking.status === 'pending' && (
                           <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                            Pending
+                            {t.caregiverBookings.pending}
                           </span>
                         )}
                         {booking.status === 'confirmed' && (
                           <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                            Confirmed
+                            {t.caregiverBookings.confirmed}
                           </span>
                         )}
                         {booking.status === 'in_progress' && (
                           <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
-                            In Progress
+                            {t.caregiverBookings.inProgress}
                           </span>
                         )}
                         {booking.status === 'completed' && (
                           <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                            Completed
+                            {t.caregiverBookings.completed}
                           </span>
                         )}
                         {booking.status === 'cancelled' && (
                           <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                            Cancelled
+                            {t.caregiverBookings.cancelled}
                           </span>
                         )}
                       </td>
@@ -202,51 +205,55 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                         <div class="flex flex-col gap-2">
                           {booking.status === 'pending' && (
                             <>
-                              <form action={`/api/bookings/${booking.id}/accept`} method="POST" class="inline">
+                              <form action="/api/bookings/accept" method="POST" class="inline">
+                                <input type="hidden" name="booking_id" value={booking.id} />
                                 <button
                                   type="submit"
                                   class="text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
                                 >
-                                  Accept
+                                  {t.caregiverBookings.accept}
                                 </button>
                               </form>
-                              <form action={`/api/bookings/${booking.id}/decline`} method="POST" class="inline">
+                              <form action="/api/bookings/decline" method="POST" class="inline">
+                                <input type="hidden" name="booking_id" value={booking.id} />
                                 <button
                                   type="submit"
                                   class="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                                 >
-                                  Decline
+                                  {t.caregiverBookings.decline}
                                 </button>
                               </form>
                             </>
                           )}
                           {booking.status === 'confirmed' && (
                             <>
-                              <form action={`/api/bookings/${booking.id}/start`} method="POST" class="inline">
+                              <form action="/api/bookings/start" method="POST" class="inline">
+                                <input type="hidden" name="booking_id" value={booking.id} />
                                 <button
                                   type="submit"
                                   class="text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                                 >
-                                  Start
+                                  {t.caregiverBookings.start}
                                 </button>
                               </form>
                             </>
                           )}
                           {booking.status === 'in_progress' && (
-                            <form action={`/api/bookings/${booking.id}/complete`} method="POST" class="inline">
+                            <form action="/api/bookings/complete" method="POST" class="inline">
+                              <input type="hidden" name="booking_id" value={booking.id} />
                               <button
                                 type="submit"
                                 class="text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
                               >
-                                Complete
+                                {t.caregiverBookings.complete}
                               </button>
                             </form>
                           )}
                           <a
-                            href={`/dashboard/messages?client=${booking.client_id}`}
+                            href={`/es/dashboard/messages?client=${booking.client_id}`}
                             class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                           >
-                            Contact
+                            {t.caregiverBookings.contact}
                           </a>
                         </div>
                       </td>
@@ -260,9 +267,9 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No bookings found</h3>
+            <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">{t.caregiverBookings.noBookings}</h3>
             <p class="mt-2 text-gray-600 dark:text-gray-400">
-              {statusFilter !== 'all' ? `No ${statusFilter.replace('_', ' ')} bookings.` : 'You have no bookings yet.'}
+              {statusFilter !== 'all' ? t.caregiverBookings.noFilteredBookings.replace('{status}', statusFilter.replace('_', ' ')) : t.caregiverBookings.noBookingsDesc}
             </p>
           </div>
         )}

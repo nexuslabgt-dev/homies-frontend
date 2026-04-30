@@ -1,4 +1,10 @@
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_ANON_KEY')!
+)
 
 Deno.serve(async (req) => {
   const { service_id, caregiver_id, pet_id, start_date, end_date, notes } = await req.json()

@@ -36,7 +36,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
 
       <div class="mb-6 flex flex-wrap gap-2">
         <a
-          href="/caregiver/bookings"
+          href="/en/caregiver/bookings"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'all'
               ? 'bg-primary-600 text-white'
@@ -46,7 +46,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           All
         </a>
         <a
-          href="/caregiver/bookings?status=pending"
+          href="/en/caregiver/bookings?status=pending"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'pending'
               ? 'bg-primary-600 text-white'
@@ -56,7 +56,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           Pending
         </a>
         <a
-          href="/caregiver/bookings?status=confirmed"
+          href="/en/caregiver/bookings?status=confirmed"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'confirmed'
               ? 'bg-primary-600 text-white'
@@ -66,7 +66,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           Confirmed
         </a>
         <a
-          href="/caregiver/bookings?status=in_progress"
+          href="/en/caregiver/bookings?status=in_progress"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'in_progress'
               ? 'bg-primary-600 text-white'
@@ -76,7 +76,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           In Progress
         </a>
         <a
-          href="/caregiver/bookings?status=completed"
+          href="/en/caregiver/bookings?status=completed"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'completed'
               ? 'bg-primary-600 text-white'
@@ -86,7 +86,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
           Completed
         </a>
         <a
-          href="/caregiver/bookings?status=cancelled"
+          href="/en/caregiver/bookings?status=cancelled"
           class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             statusFilter === 'cancelled'
               ? 'bg-primary-600 text-white'
@@ -202,7 +202,8 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                         <div class="flex flex-col gap-2">
                           {booking.status === 'pending' && (
                             <>
-                              <form action={`/api/bookings/${booking.id}/accept`} method="POST" class="inline">
+                              <form action="/api/bookings/accept" method="POST" class="inline">
+                                <input type="hidden" name="booking_id" value={booking.id} />
                                 <button
                                   type="submit"
                                   class="text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
@@ -210,7 +211,8 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                                   Accept
                                 </button>
                               </form>
-                              <form action={`/api/bookings/${booking.id}/decline`} method="POST" class="inline">
+                              <form action="/api/bookings/decline" method="POST" class="inline">
+                                <input type="hidden" name="booking_id" value={booking.id} />
                                 <button
                                   type="submit"
                                   class="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
@@ -222,7 +224,8 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                           )}
                           {booking.status === 'confirmed' && (
                             <>
-                              <form action={`/api/bookings/${booking.id}/start`} method="POST" class="inline">
+                              <form action="/api/bookings/start" method="POST" class="inline">
+                                <input type="hidden" name="booking_id" value={booking.id} />
                                 <button
                                   type="submit"
                                   class="text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
@@ -233,7 +236,8 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                             </>
                           )}
                           {booking.status === 'in_progress' && (
-                            <form action={`/api/bookings/${booking.id}/complete`} method="POST" class="inline">
+                            <form action="/api/bookings/complete" method="POST" class="inline">
+                              <input type="hidden" name="booking_id" value={booking.id} />
                               <button
                                 type="submit"
                                 class="text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
@@ -243,7 +247,7 @@ const statusFilter = Astro.url.searchParams.get('status') || 'all';
                             </form>
                           )}
                           <a
-                            href={`/dashboard/messages?client=${booking.client_id}`}
+                            href={`/en/dashboard/messages?client=${booking.client_id}`}
                             class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                           >
                             Contact
