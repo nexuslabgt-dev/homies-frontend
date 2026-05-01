@@ -37,28 +37,48 @@ const { data: pets } = await supabase
                 {pets.map((pet) => (
                   <div class="p-6 flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                      </div>
+                      {pet.photo_url ? (
+                        <img
+                          src={pet.photo_url}
+                          alt={pet.name ?? t.dashboardPets.unnamed}
+                          class="h-12 w-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                        </div>
+                      )}
                       <div>
                         <p class="font-medium text-gray-900 dark:text-white">{pet.name ?? t.dashboardPets.unnamed}</p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                          {pet.type ? pet.type.charAt(0).toUpperCase() + pet.type.slice(1) : t.dashboardPets.unknownType}
+                          {pet.species ? pet.species.charAt(0).toUpperCase() + pet.species.slice(1) : t.dashboardPets.unknownType}
                           {pet.breed && ` - ${pet.breed}`}
                         </p>
                         <p class="text-sm text-gray-500 dark:text-gray-500">
-                          {pet.size ? pet.size.charAt(0).toUpperCase() + pet.size.slice(1) : t.dashboardPets.unknownSize}
-                          {pet.age_months && ` - ${pet.age_months} meses`}
+                          {pet.age ? `${pet.age} meses` : ''}
                         </p>
                       </div>
                     </div>
                     <div class="flex items-center gap-2">
-                      <button class="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+                      <button
+                        class="edit-btn rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                        data-pet-id={pet.id}
+                        data-pet-name={pet.name ?? ''}
+                        data-pet-species={pet.species ?? ''}
+                        data-pet-breed={pet.breed ?? ''}
+                        data-pet-age={pet.age ?? ''}
+                        data-pet-temperament={pet.temperament ?? ''}
+                        data-pet-medical-notes={pet.medical_notes ?? ''}
+                        data-pet-photo-url={pet.photo_url ?? ''}
+                      >
                         {t.dashboardPets.edit}
                       </button>
-                      <button class="rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
+                      <button
+                        class="delete-btn rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                        data-pet-id={pet.id}
+                      >
                         {t.dashboardPets.delete}
                       </button>
                     </div>
@@ -174,6 +194,22 @@ const { data: pets } = await supabase
                 ></textarea>
               </div>
 
+              <div>
+                <label for="petPhoto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t.dashboardPets.petPhoto}
+                </label>
+                <input
+                  type="file"
+                  id="petPhoto"
+                  name="petPhoto"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-primary-700 dark:text-gray-400 dark:file:bg-primary-700 dark:hover:file:bg-primary-600"
+                />
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {t.dashboardPets.petPhotoHint}
+                </p>
+              </div>
+
               <div id="form-message" class="hidden text-sm"></div>
 
               <button type="submit" class="btn-primary w-full">
@@ -185,6 +221,52 @@ const { data: pets } = await supabase
       </div>
     </div>
   </section>
+
+  <!-- Edit Modal -->
+  <div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+    <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-gray-900">
+      <h3 class="font-serif text-xl font-bold text-gray-900 dark:text-white mb-4">Editar Mascota</h3>
+      <form id="edit-form" class="space-y-4">
+        <input type="hidden" id="edit-pet-id" name="editPetId" />
+        <div>
+          <label for="edit-pet-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+          <input type="text" id="edit-pet-name" name="editPetName" required class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
+        </div>
+        <div>
+          <label for="edit-pet-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
+          <select id="edit-pet-type" name="editPetType" required class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+            <option value="dog">Perro</option>
+            <option value="cat">Gato</option>
+            <option value="bird">Ave</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label for="edit-pet-breed" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Raza</label>
+          <input type="text" id="edit-pet-breed" name="editPetBreed" class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="edit-pet-age" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Edad (meses)</label>
+            <input type="number" id="edit-pet-age" name="editPetAge" min="0" class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
+          </div>
+          <div>
+            <label for="edit-pet-temperament" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Temperamento</label>
+            <input type="text" id="edit-pet-temperament" name="editPetTemperament" class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
+          </div>
+        </div>
+        <div>
+          <label for="edit-pet-notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notas médicas</label>
+          <textarea id="edit-pet-notes" name="editPetNotes" rows="3" class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"></textarea>
+        </div>
+        <div id="edit-form-message" class="hidden text-sm"></div>
+        <div class="flex gap-3">
+          <button type="button" id="edit-cancel" class="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+          <button type="submit" class="btn-primary flex-1">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </Base>
 
 <script>
@@ -192,6 +274,9 @@ const { data: pets } = await supabase
 
   const form = document.getElementById('pet-form') as HTMLFormElement;
   const messageDiv = document.getElementById('form-message') as HTMLDivElement;
+
+  const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const MAX_SIZE = 2 * 1024 * 1024; // 2MB
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -204,26 +289,162 @@ const { data: pets } = await supabase
     }
 
     const formData = new FormData(form);
-    const { error } = await supabase.from('pets').insert({
+    const photoFile = formData.get('petPhoto') as File | null;
+
+    // Insert pet first (without photo)
+    const { data: insertedPet, error: insertError } = await supabase.from('pets').insert({
       owner_id: session.user.id,
       name: formData.get('petName'),
-      type: formData.get('petType'),
+      species: formData.get('petType'),
       breed: formData.get('breed') || null,
-      size: formData.get('size') || null,
-      age_months: formData.get('ageMonths') ? parseInt(formData.get('ageMonths') as string) : null,
-      notes: formData.get('notes') || null,
-    });
+      age: formData.get('ageMonths') ? parseInt(formData.get('ageMonths') as string) : null,
+      medical_notes: formData.get('notes') || null,
+    }).select('id').single();
 
-    if (error) {
-      messageDiv.textContent = error.message;
+    if (insertError) {
+      messageDiv.textContent = insertError.message;
       messageDiv.classList.remove('hidden');
       messageDiv.classList.add('text-red-600', 'dark:text-red-400');
+      return;
+    }
+
+    const petId = insertedPet.id;
+
+    // Upload photo if provided
+    if (photoFile && photoFile.size > 0) {
+      if (!ALLOWED_TYPES.includes(photoFile.type)) {
+        messageDiv.textContent = 'Tipo de archivo no válido. Usa JPG, PNG o WebP.';
+        messageDiv.classList.remove('hidden');
+        messageDiv.classList.add('text-red-600', 'dark:text-red-400');
+        return;
+      }
+      if (photoFile.size > MAX_SIZE) {
+        messageDiv.textContent = 'El archivo es demasiado grande. Máximo 2MB.';
+        messageDiv.classList.remove('hidden');
+        messageDiv.classList.add('text-red-600', 'dark:text-red-400');
+        return;
+      }
+
+      const ext = photoFile.name.split('.').pop() || 'jpg';
+      const filePath = `pets/${session.user.id}/${petId}/${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('uploads')
+        .upload(filePath, photoFile);
+
+      if (uploadError) {
+        messageDiv.textContent = 'Error al subir la foto: ' + uploadError.message;
+        messageDiv.classList.remove('hidden');
+        messageDiv.classList.add('text-red-600', 'dark:text-red-400');
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('pets')
+        .update({ photo_url: publicUrl })
+        .eq('id', petId);
+
+      if (updateError) {
+        messageDiv.textContent = 'Error al guardar la foto: ' + updateError.message;
+        messageDiv.classList.remove('hidden');
+        messageDiv.classList.add('text-red-600', 'dark:text-red-400');
+        return;
+      }
+    }
+
+    messageDiv.textContent = 'Mascota agregada exitosamente!';
+    messageDiv.classList.remove('hidden', 'text-red-600', 'dark:text-red-400');
+    messageDiv.classList.add('text-green-600', 'dark:text-green-400');
+    form.reset();
+    setTimeout(() => window.location.reload(), 1000);
+  });
+
+  // Delete handlers
+  document.querySelectorAll('.delete-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const petId = (btn as HTMLElement).dataset.petId;
+      if (!petId) return;
+      if (!confirm('¿Estás seguro de que deseas eliminar esta mascota?')) return;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/es/login';
+        return;
+      }
+
+      const { error } = await supabase.from('pets').delete().eq('id', petId).eq('owner_id', session.user.id);
+      if (error) {
+        alert('Error al eliminar: ' + error.message);
+      } else {
+        window.location.reload();
+      }
+    });
+  });
+
+  // Edit modal
+  const editModal = document.getElementById('edit-modal') as HTMLDivElement;
+  const editForm = document.getElementById('edit-form') as HTMLFormElement;
+  const editMessageDiv = document.getElementById('edit-form-message') as HTMLDivElement;
+
+  document.querySelectorAll('.edit-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const dataset = (btn as HTMLElement).dataset;
+      (document.getElementById('edit-pet-id') as HTMLInputElement).value = dataset.petId || '';
+      (document.getElementById('edit-pet-name') as HTMLInputElement).value = dataset.petName || '';
+      (document.getElementById('edit-pet-type') as HTMLSelectElement).value = dataset.petSpecies || '';
+      (document.getElementById('edit-pet-breed') as HTMLInputElement).value = dataset.petBreed || '';
+      (document.getElementById('edit-pet-age') as HTMLInputElement).value = dataset.petAge || '';
+      (document.getElementById('edit-pet-temperament') as HTMLInputElement).value = dataset.petTemperament || '';
+      (document.getElementById('edit-pet-notes') as HTMLTextAreaElement).value = dataset.petMedicalNotes || '';
+      editMessageDiv.classList.add('hidden');
+      editModal.classList.remove('hidden');
+      editModal.classList.add('flex');
+    });
+  });
+
+  document.getElementById('edit-cancel')?.addEventListener('click', () => {
+    editModal.classList.add('hidden');
+    editModal.classList.remove('flex');
+  });
+
+  editModal.addEventListener('click', (e) => {
+    if (e.target === editModal) {
+      editModal.classList.add('hidden');
+      editModal.classList.remove('flex');
+    }
+  });
+
+  editForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    editMessageDiv.classList.add('hidden');
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.href = '/es/login';
+      return;
+    }
+
+    const formData = new FormData(editForm);
+    const petId = formData.get('editPetId') as string;
+    const { error } = await supabase.from('pets').update({
+      name: formData.get('editPetName'),
+      species: formData.get('editPetType'),
+      breed: formData.get('editPetBreed') || null,
+      age: formData.get('editPetAge') ? parseInt(formData.get('editPetAge') as string) : null,
+      temperament: formData.get('editPetTemperament') || null,
+      medical_notes: formData.get('editPetNotes') || null,
+    }).eq('id', petId).eq('owner_id', session.user.id);
+
+    if (error) {
+      editMessageDiv.textContent = error.message;
+      editMessageDiv.classList.remove('hidden');
+      editMessageDiv.classList.add('text-red-600', 'dark:text-red-400');
     } else {
-      messageDiv.textContent = 'Mascota agregada exitosamente!';
-      messageDiv.classList.remove('hidden', 'text-red-600', 'dark:text-red-400');
-      messageDiv.classList.add('text-green-600', 'dark:text-green-400');
-      form.reset();
-      setTimeout(() => window.location.reload(), 1000);
+      window.location.reload();
     }
   });
 </script>

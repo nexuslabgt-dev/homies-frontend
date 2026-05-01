@@ -10,3 +10,14 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey)
 export const SUPABASE_URL = supabaseUrl
+
+const supabaseServiceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+
+export const supabaseAdmin = supabaseServiceRoleKey
+  ? createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+  : null

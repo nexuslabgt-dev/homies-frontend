@@ -1,6 +1,9 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { supabase } from '@/lib/supabase';
+import { getTranslations } from '@/i18n';
+
+const t = getTranslations(Astro.currentLocale || 'en');
 
 const { data: { session } } = await supabase.auth.getSession();
 if (!session) return Astro.redirect('/login');
@@ -141,7 +144,7 @@ const avgRating = reviewStats?.length
         </div>
       </div>
 
-      <div class="grid gap-8 lg:grid-cols-3 mb-8">
+      <div class="grid gap-8 lg:grid-cols-4 mb-8">
         <div class="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-900">
           <h2 class="font-serif text-xl font-bold text-gray-900 dark:text-white mb-2">
             Total Earnings
@@ -170,6 +173,59 @@ const avgRating = reviewStats?.length
           <p class="text-3xl font-bold text-gray-900 dark:text-white">
             ${caregiver.hourly_rate ? (caregiver.hourly_rate / 100).toFixed(2) : '0.00'}/hr
           </p>
+        </div>
+
+        <div class="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-900">
+          <h2 class="font-serif text-xl font-bold text-gray-900 dark:text-white mb-2">
+            {t.caregiverDashboard.availability}
+          </h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{t.caregiverDashboard.availabilityDesc}</p>
+          <div id="availability-data" data-availability={JSON.stringify(caregiver.availability || [])} class="hidden"></div>
+          <form id="availability-form" data-caregiver-id={caregiver.id} data-saved-message={t.caregiverDashboard.availabilitySaved} class="space-y-3">
+            {[
+              { key: 'monday', label: t.caregiverDashboard.monday },
+              { key: 'tuesday', label: t.caregiverDashboard.tuesday },
+              { key: 'wednesday', label: t.caregiverDashboard.wednesday },
+              { key: 'thursday', label: t.caregiverDashboard.thursday },
+              { key: 'friday', label: t.caregiverDashboard.friday },
+              { key: 'saturday', label: t.caregiverDashboard.saturday },
+              { key: 'sunday', label: t.caregiverDashboard.sunday },
+            ].map((day) => (
+              <div class="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+                <label class="flex items-center gap-2 min-w-[120px] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    value={day.key}
+                    class="day-checkbox h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-800"
+                    data-day={day.key}
+                  />
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{day.label}</span>
+                </label>
+                <div class="day-times hidden flex-1 flex flex-col sm:flex-row gap-2">
+                  <div class="flex-1">
+                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{t.caregiverDashboard.startTime}</label>
+                    <input
+                      type="time"
+                      class="start-time w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      data-day={day.key}
+                    />
+                  </div>
+                  <div class="flex-1">
+                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{t.caregiverDashboard.endTime}</label>
+                    <input
+                      type="time"
+                      class="end-time w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      data-day={day.key}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div id="availability-message" class="hidden text-sm pt-2"></div>
+            <button type="submit" class="btn-primary w-full mt-4">
+              {t.caregiverDashboard.saveAvailability}
+            </button>
+          </form>
         </div>
       </div>
 
@@ -305,4 +361,90 @@ const avgRating = reviewStats?.length
       </div>
     </div>
   </section>
+
+  <script>
+    import { supabase } from '@/lib/supabase';
+
+    const form = document.getElementById('availability-form') as HTMLFormElement;
+    const messageDiv = document.getElementById('availability-message') as HTMLDivElement;
+    const availabilityDataEl = document.getElementById('availability-data') as HTMLDivElement;
+
+    const caregiverId = form.dataset.caregiverId!;
+    const savedMessage = form.dataset.savedMessage!;
+    const availability = JSON.parse(availabilityDataEl.dataset.availability || '[]') as Array<{ day: string; start: string; end: string }>;
+
+    // Initialize existing availability
+    availability.forEach((slot) => {
+      const checkbox = form.querySelector(`input[type="checkbox"][data-day="${slot.day}"]`) as HTMLInputElement;
+      if (checkbox) {
+        checkbox.checked = true;
+        const row = checkbox.closest('.flex')?.querySelector('.day-times') as HTMLDivElement;
+        if (row) {
+          row.classList.remove('hidden');
+          const startInput = row.querySelector('.start-time') as HTMLInputElement;
+          const endInput = row.querySelector('.end-time') as HTMLInputElement;
+          if (startInput) startInput.value = slot.start;
+          if (endInput) endInput.value = slot.end;
+        }
+      }
+    });
+
+    // Toggle time inputs on checkbox change
+    form.querySelectorAll('.day-checkbox').forEach((checkbox) => {
+      checkbox.addEventListener('change', () => {
+        const cb = checkbox as HTMLInputElement;
+        const row = cb.closest('.flex')?.querySelector('.day-times') as HTMLDivElement;
+        if (row) {
+          if (cb.checked) {
+            row.classList.remove('hidden');
+            const startInput = row.querySelector('.start-time') as HTMLInputElement;
+            const endInput = row.querySelector('.end-time') as HTMLInputElement;
+            if (!startInput.value) startInput.value = '08:00';
+            if (!endInput.value) endInput.value = '18:00';
+          } else {
+            row.classList.add('hidden');
+            const startInput = row.querySelector('.start-time') as HTMLInputElement;
+            const endInput = row.querySelector('.end-time') as HTMLInputElement;
+            startInput.value = '';
+            endInput.value = '';
+          }
+        }
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.classList.add('hidden');
+
+      const checkboxes = form.querySelectorAll('.day-checkbox:checked');
+      const availabilityArray: { day: string; start: string; end: string }[] = [];
+
+      checkboxes.forEach((checkbox) => {
+        const cb = checkbox as HTMLInputElement;
+        const row = cb.closest('.flex')?.querySelector('.day-times') as HTMLDivElement;
+        const start = (row.querySelector('.start-time') as HTMLInputElement).value;
+        const end = (row.querySelector('.end-time') as HTMLInputElement).value;
+
+        if (start && end) {
+          availabilityArray.push({ day: cb.value, start, end });
+        }
+      });
+
+      const { error } = await supabase
+        .from('caregivers')
+        .update({ availability: availabilityArray })
+        .eq('id', caregiverId);
+
+      if (error) {
+        messageDiv.textContent = error.message;
+        messageDiv.classList.remove('hidden');
+        messageDiv.classList.add('text-red-600', 'dark:text-red-400');
+        return;
+      }
+
+      messageDiv.textContent = savedMessage;
+      messageDiv.classList.remove('hidden');
+      messageDiv.classList.add('text-green-600', 'dark:text-green-400');
+    });
+  </script>
 </Base>

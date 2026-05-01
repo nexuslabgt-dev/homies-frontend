@@ -37,7 +37,7 @@ if (user) {
         user_id: otherUserId,
         profile,
         last_message: msg,
-        unread_count: msg.receiver_id === user.id && !msg.read_at ? 1 : 0
+        unread_count: msg.receiver_id === user.id && !msg.is_read ? 1 : 0
       })
     }
 
@@ -201,7 +201,7 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
         user_id: otherUserId,
         profile,
         last_message: msg,
-        unread_count: msg.receiver_id === userId && !msg.read_at ? 1 : 0
+        unread_count: msg.receiver_id === userId && !msg.is_read ? 1 : 0
       });
     }
 
@@ -279,10 +279,10 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
 
     await window.supabaseClient
       .from('messages')
-      .update({ read_at: new Date().toISOString() })
+      .update({ is_read: true })
       .eq('receiver_id', userId)
       .eq('sender_id', conv.user_id)
-      .is('read_at', null);
+      .eq('is_read', false);
 
     conv.unread_count = 0;
     updateUnreadCount();
@@ -387,7 +387,7 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
                 if (msg.receiver_id === userId && msg.sender_id !== userId) {
                   await window.supabaseClient
                     .from('messages')
-                    .update({ read_at: new Date().toISOString() })
+                    .update({ is_read: true })
                     .eq('id', msg.id);
                 }
               }

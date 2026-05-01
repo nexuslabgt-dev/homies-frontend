@@ -3,8 +3,6 @@ import { getTranslations } from '@/i18n';
 
 const locale = Astro.currentLocale || 'es';
 const t = getTranslations(locale);
-
-const mapUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15442.273487!2d-90.735!3d14.558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8589a3c6f3c0f1c1%3A0x7c6d6f6f6f6f6f6!2sAntigua%20Guatemala!5e0!3m2!1sen!2sgt!4v1700000000000!5m2!1sen!2sgt";
 ---
 
 <section id="coverage" class="section-padding bg-white dark:bg-gray-950">
@@ -20,13 +18,7 @@ const mapUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15442.2734
 
     <div class="mt-12" data-animate>
       <div class="aspect-video overflow-hidden rounded-2xl shadow-xl">
-        <iframe
-          src={mapUrl}
-          class="w-full h-full"
-          loading="lazy"
-          allowfullscreen
-          referrerpolicy="no-referrer-when-downgrade"
-        />
+        <div id="coverage-map" class="w-full h-full bg-gray-100 dark:bg-gray-800"></div>
       </div>
     </div>
 
@@ -90,3 +82,87 @@ const mapUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15442.2734
     </div>
   </div>
 </section>
+
+<script define:vars={{ apiKey: import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY }}>
+  /* global google */
+  function initCoverageMap() {
+    const mapContainer = document.getElementById('coverage-map');
+    if (!mapContainer) return;
+
+    if (!apiKey) {
+      mapContainer.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400 text-sm md:text-base">Mapa no disponible sin API key de Google Maps</div>';
+      return;
+    }
+
+    const isDark = document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
+
+    const darkStyles = [
+      { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+      { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+      { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+      { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#263c3f' }] },
+      { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#6b9a76' }] },
+      { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#38414e' }] },
+      { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212a37' }] },
+      { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#9ca5b3' }] },
+      { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#746855' }] },
+      { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#1f2835' }] },
+      { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#f3d19c' }] },
+      { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#2f3948' }] },
+      { featureType: 'transit.station', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#17263c' }] },
+      { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#515c6d' }] },
+      { featureType: 'water', elementType: 'labels.text.stroke', stylers: [{ color: '#17263c' }] }
+    ];
+
+    window.initCoverageMapInstance = function() {
+      const map = new google.maps.Map(mapContainer, {
+        center: { lat: 14.5586, lng: -90.7295 },
+        zoom: 13,
+        styles: isDark ? darkStyles : [],
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: true,
+      });
+
+      const zones = [
+        { lat: 14.5586, lng: -90.7295, title: 'Centro', desc: 'Antigua Guatemala' },
+        { lat: 14.5814, lng: -90.7458, title: 'Jocotenango', desc: '5 km' },
+        { lat: 14.5256, lng: -90.7593, title: 'Ciudad Vieja', desc: '8 km' },
+      ];
+
+      zones.forEach((zone) => {
+        const marker = new google.maps.Marker({
+          position: { lat: zone.lat, lng: zone.lng },
+          map,
+          title: zone.title,
+        });
+        const info = new google.maps.InfoWindow({
+          content: '<strong>' + zone.title + '</strong><br>' + zone.desc,
+        });
+        marker.addListener('click', () => info.open(map, marker));
+      });
+    };
+
+    if (window.google && window.google.maps) {
+      window.initCoverageMapInstance();
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&callback=initCoverageMapInstance';
+      script.async = true;
+      script.defer = true;
+      script.onerror = function() {
+        mapContainer.innerHTML = '<div class="flex items-center justify-center h-full text-red-500 text-sm md:text-base">Error al cargar Google Maps.</div>';
+      };
+      document.head.appendChild(script);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCoverageMap);
+  } else {
+    initCoverageMap();
+  }
+</script>

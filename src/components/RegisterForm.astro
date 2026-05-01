@@ -146,7 +146,7 @@
     const role = (form.querySelector('#role') as HTMLSelectElement).value;
     const password = (form.querySelector('#password') as HTMLInputElement).value;
 
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -162,6 +162,50 @@
       errorDiv.textContent = error.message;
       errorDiv.classList.remove('hidden');
     } else {
+      // Send welcome email
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+              to: email,
+              subject: '¡Bienvenido a Homies Pets! 🐾',
+              html: `<div style="font-family: 'Poppins', sans-serif; max-width: 600px; margin: 0 auto; color: #171c1a;">
+  <div style="background: #2d9290; padding: 24px; text-align: center; border-radius: 12px 12px 0 0;">
+    <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 700;">Homies Pets</h1>
+    <p style="color: rgba(255,255,255,0.9); margin: 4px 0 0; font-size: 14px;">You leave them, we love them!</p>
+  </div>
+  <div style="padding: 32px; background: #ffffff; border-left: 1px solid #e4e7e6; border-right: 1px solid #e4e7e6;">
+    <h2 style="color: #2d9290; margin: 0 0 16px; font-size: 20px; font-weight: 600;">¡Bienvenido a la familia Homies!</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 16px;">Hola <strong>${fullName}</strong>,</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 16px;">Gracias por unirte a <strong>Homies Pets</strong>. Estamos emocionados de cuidar a tus mascotas con el mismo amor y dedicación que tú les das.</p>
+    <div style="background: #f9fafa; padding: 16px; border-radius: 8px; margin: 16px 0;">
+      <p style="margin: 0 0 8px;"><strong>¿Qué puedes hacer ahora?</strong></p>
+      <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+        <li>Explora nuestros servicios de cuidado</li>
+        <li>Registra a tus mascotas en tu perfil</li>
+        <li>Reserva con cuidadores de confianza</li>
+      </ul>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0;">Si tienes alguna pregunta, no dudes en contactarnos. ¡Esperamos verte pronto!</p>
+  </div>
+  <div style="padding: 20px; text-align: center; color: #6c7873; font-size: 12px; background: #f4f5f5; border-radius: 0 0 12px 12px; border: 1px solid #e4e7e6; border-top: none;">
+    <p style="margin: 0 0 4px;"><strong>Homies Pets</strong> - Antigua Guatemala</p>
+    <p style="margin: 0;">¿Necesitas ayuda? Escríbenos a <a href="mailto:homies.pets.care@gmail.com" style="color: #2d9290;">homies.pets.care@gmail.com</a></p>
+  </div>
+</div>`
+            })
+          });
+        }
+      } catch (emailErr) {
+        console.error('[Register] Welcome email error:', emailErr);
+      }
+
       window.location.href = '/' + getLocale() + '/dashboard';
     }
   });

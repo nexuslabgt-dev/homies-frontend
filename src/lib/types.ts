@@ -17,6 +17,7 @@ export interface Profile {
   avatar_url: string | null
   address: string | null
   city: string | null
+  role: string
   created_at: string
   updated_at: string
 }
@@ -31,6 +32,8 @@ export interface Caregiver {
   rating: number
   review_count: number
   is_available: boolean
+  is_verified: boolean
+  availability: Json
   created_at: string
   updated_at: string
 }

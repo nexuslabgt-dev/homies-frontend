@@ -656,6 +656,50 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('booking-reference')!.textContent = ref
 
       showStep(5)
+
+      // Send booking confirmation email
+      try {
+        const serviceName = state.selectedService ? state.selectedService.data.name : 'Servicio'
+        const startDate = state.startDate ? new Date(state.startDate).toLocaleDateString('es-GT') : '-'
+        const endDate = state.endDate ? new Date(state.endDate).toLocaleDateString('es-GT') : startDate
+        const totalPrice = `Q.${state.totalPrice}`
+
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            to: session.user.email,
+            subject: '¡Tu reserva ha sido creada! 🐾',
+            html: `<div style="font-family: 'Poppins', sans-serif; max-width: 600px; margin: 0 auto; color: #171c1a;">
+  <div style="background: #2d9290; padding: 24px; text-align: center; border-radius: 12px 12px 0 0;">
+    <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 700;">Homies Pets</h1>
+    <p style="color: rgba(255,255,255,0.9); margin: 4px 0 0; font-size: 14px;">You leave them, we love them!</p>
+  </div>
+  <div style="padding: 32px; background: #ffffff; border-left: 1px solid #e4e7e6; border-right: 1px solid #e4e7e6;">
+    <h2 style="color: #2d9290; margin: 0 0 16px; font-size: 20px; font-weight: 600;">Reserva Creada</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 16px;">¡Gracias por tu reserva! Hemos recibido tu solicitud y un cuidador se pondrá en contacto contigo pronto para confirmar los detalles.</p>
+    <div style="background: #f9fafa; padding: 16px; border-radius: 8px; margin: 16px 0;">
+      <p style="margin: 0 0 8px;"><strong>Referencia:</strong> ${ref}</p>
+      <p style="margin: 0 0 8px;"><strong>Servicio:</strong> ${serviceName}</p>
+      <p style="margin: 0 0 8px;"><strong>Fecha inicio:</strong> ${startDate}</p>
+      <p style="margin: 0 0 8px;"><strong>Fecha fin:</strong> ${endDate}</p>
+      <p style="margin: 0;"><strong>Total:</strong> ${totalPrice}</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0;">Puedes seguir el estado de tu reserva desde tu panel de control.</p>
+  </div>
+  <div style="padding: 20px; text-align: center; color: #6c7873; font-size: 12px; background: #f4f5f5; border-radius: 0 0 12px 12px; border: 1px solid #e4e7e6; border-top: none;">
+    <p style="margin: 0 0 4px;"><strong>Homies Pets</strong> - Antigua Guatemala</p>
+    <p style="margin: 0;">¿Necesitas ayuda? Escríbenos a <a href="mailto:homies.pets.care@gmail.com" style="color: #2d9290;">homies.pets.care@gmail.com</a></p>
+  </div>
+</div>`
+          })
+        })
+      } catch (emailErr) {
+        console.error('[BookingForm] Confirmation email error:', emailErr)
+      }
     } catch (error: any) {
       console.error('Booking error:', error)
       if (errorEl) {
