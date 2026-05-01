@@ -18,96 +18,117 @@ Agregar backend a Astro para manejar: usuarios, bookings, mensajería, y pagos.
 
 ```sql
 -- Perfiles de usuario (extiende auth.users)
-profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users,
-  role TEXT CHECK (role IN ('client', 'caregiver', 'admin')),
-  full_name TEXT,
-  phone TEXT,
-  avatar_url TEXT,
-  address TEXT,
-  bio TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-)
+create table profiles (
+  id uuid primary key references auth.users(id),
+  full_name text not null,
+  phone text,
+  avatar_url text,
+  address text,
+  city text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
 -- Cuidadores (extensión de profiles)
-caregivers (
-  profile_id UUID PRIMARY KEY REFERENCES profiles,
-  specialties TEXT[],
-  availability JSONB,
-  hourly_rate DECIMAL,
-  service_types TEXT[],
-  is_verified BOOLEAN DEFAULT false,
-  average_rating DECIMAL
-)
+create table caregivers (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null unique references profiles(id),
+  bio text,
+  experience text,
+  services text[] not null default '{}',
+  hourly_rate numeric,
+  rating numeric default 0,
+  review_count integer default 0,
+  is_available boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
 -- Mascotas
-pets (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner_id UUID REFERENCES profiles,
-  name TEXT,
-  type TEXT CHECK (type IN ('dog', 'cat', 'bird', 'other')),
-  breed TEXT,
-  size TEXT CHECK (size IN ('small', 'medium', 'large')),
-  age_months INTEGER,
-  notes TEXT,
-  photo_url TEXT
-)
+create table pets (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references profiles(id),
+  name text not null,
+  species text not null,
+  breed text,
+  age integer,
+  weight numeric,
+  temperament text,
+  medical_notes text,
+  photo_url text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
 -- Servicios disponibles
-services (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT,
-  description TEXT,
-  price_cents INTEGER,
-  duration_minutes INTEGER,
-  is_active BOOLEAN DEFAULT true
-)
+create table services (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  description text,
+  base_price numeric not null,
+  price_unit text not null,
+  duration_minutes integer,
+  icon text,
+  is_active boolean default true,
+  created_at timestamptz default now()
+);
 
 -- Bookings
-bookings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  client_id UUID REFERENCES profiles,
-  caregiver_id UUID REFERENCES caregivers,
-  service_id UUID REFERENCES services,
-  pet_id UUID REFERENCES pets,
-  start_date DATE,
-  end_date DATE,
-  status TEXT CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed')),
-  total_price DECIMAL,
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-)
+create table bookings (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null references profiles(id),
+  caregiver_id uuid not null references caregivers(id),
+  service_id uuid not null references services(id),
+  pet_id uuid not null references pets(id),
+  start_date timestamptz not null,
+  end_date timestamptz,
+  status text not null default 'pending' check (status in ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')),
+  total_price numeric,
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
 -- Reviews
-reviews (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  booking_id UUID REFERENCES bookings,
-  rating INTEGER CHECK (rating BETWEEN 1 AND 5),
-  comment TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-)
+create table reviews (
+  id uuid primary key default gen_random_uuid(),
+  booking_id uuid not null unique references bookings(id),
+  author_id uuid not null references profiles(id),
+  caregiver_id uuid not null references caregivers(id),
+  rating integer not null check (rating >= 1 and rating <= 5),
+  comment text,
+  created_at timestamptz default now()
+);
 
 -- Mensajes (chat simple)
-messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender_id UUID REFERENCES profiles,
-  receiver_id UUID REFERENCES profiles,
-  content TEXT,
-  read_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT now()
-)
+create table messages (
+  id uuid primary key default gen_random_uuid(),
+  sender_id uuid not null references profiles(id),
+  receiver_id uuid not null references profiles(id),
+  content text not null,
+  is_read boolean default false,
+  created_at timestamptz default now()
+);
 
 -- Garantía de Seguridad (contenido homepage)
-security_features (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  description TEXT NOT NULL,
-  icon TEXT NOT NULL DEFAULT 'shield',
-  sort_order INTEGER DEFAULT 0,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-)
+create table security_features (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text not null,
+  icon text not null default 'shield',
+  sort_order integer default 0,
+  is_active boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Newsletter subscribers
+create table newsletter_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  is_active boolean default true,
+  subscribed_at timestamptz default now()
+);
 ```
 
 ---

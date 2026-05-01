@@ -1,7 +1,5 @@
 ---
 import { services } from '../data/site'
-import { supabase } from '../lib/supabase'
-import type { Pet } from '../lib/types'
 import { getTranslations } from '@/i18n'
 
 interface Props {
@@ -15,7 +13,18 @@ const t = getTranslations(locale)
 const serviceList = services.slice(0, 6)
 ---
 
-<div class={`booking-form-container ${className}`} data-step="1">
+<div id="booking-form-container" class={`booking-form-container ${className}`} data-step="1"
+  data-please-select-date={t.booking.pleaseSelectDate}
+  data-please-enter-pet-name={t.booking.pleaseEnterPetName}
+  data-please-sign-in={t.booking.pleaseSignIn}
+  data-booking-error={t.booking.bookingError}
+  data-service-label={t.booking.service}
+  data-duration-label={t.booking.duration}
+  data-total-label={t.booking.total}
+  data-pet-label={t.booking.pet}
+  data-pet-type-size-label={t.booking.petTypeSize}
+  data-total-price-label={t.booking.totalPrice}
+>
   <div class="form-progress mb-8">
     <div class="flex items-center justify-between">
       {[1, 2, 3, 4].map((n) => (
@@ -39,8 +48,8 @@ const serviceList = services.slice(0, 6)
 
     <div class="step-container">
       <div id="step-1" class="step-content" data-step="1">
-        <h3 class="text-2xl font-bold text-white mb-2">Select a Service</h3>
-        <p class="text-gray-400 mb-6">Choose the perfect service for your pet</p>
+        <h3 class="text-2xl font-bold text-white mb-2">{t.booking.step1}</h3>
+        <p class="text-gray-400 mb-6">{t.booking.step1Desc}</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {serviceList.map((service, index) => (
             <button
@@ -65,85 +74,85 @@ const serviceList = services.slice(0, 6)
         </div>
         <div class="mt-6 flex justify-end">
           <button type="button" id="next-step-1" class="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-            Next Step
+            {t.booking.nextStep}
           </button>
         </div>
       </div>
 
       <div id="step-2" class="step-content hidden" data-step="2">
-        <h3 class="text-2xl font-bold text-white mb-2">Select Dates</h3>
-        <p class="text-gray-400 mb-6">Choose when you need the service</p>
+        <h3 class="text-2xl font-bold text-white mb-2">{t.booking.step2}</h3>
+        <p class="text-gray-400 mb-6">{t.booking.step2Desc}</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm text-gray-300 mb-2">Start Date</label>
+            <label class="block text-sm text-gray-300 mb-2">{t.booking.startDate}</label>
             <input type="date" id="start-date" name="start_date" required class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none" />
           </div>
           <div>
-            <label class="block text-sm text-gray-300 mb-2">End Date <span class="text-gray-500">(optional for day services)</span></label>
+            <label class="block text-sm text-gray-300 mb-2">{t.booking.endDate}</label>
             <input type="date" id="end-date" name="end_date" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none" />
           </div>
         </div>
         <div id="price-summary-2" class="mt-6 p-4 bg-dark-200 rounded-lg hidden">
           <div class="flex justify-between items-center">
-            <span class="text-gray-300">Service:</span>
+            <span class="text-gray-300" data-service-label>{t.booking.service}:</span>
             <span id="selected-service-name" class="text-white font-semibold">-</span>
           </div>
           <div class="flex justify-between items-center mt-2">
-            <span class="text-gray-300">Duration:</span>
+            <span class="text-gray-300" data-duration-label>{t.booking.duration}:</span>
             <span id="selected-duration" class="text-white font-semibold">-</span>
           </div>
           <div class="flex justify-between items-center mt-4 pt-4 border-t border-dark-100">
-            <span class="text-lg font-bold text-white">Total:</span>
+            <span class="text-lg font-bold text-white" data-total-label>{t.booking.total}:</span>
             <span id="selected-total-price" class="text-xl font-bold text-accent">Q.0</span>
           </div>
         </div>
         <div class="mt-6 flex justify-between">
           <button type="button" class="back-btn px-6 py-3 bg-dark-200 text-white rounded-lg font-semibold hover:bg-dark-100 transition-colors" data-goto="1">
-            Back
+            {t.booking.back}
           </button>
           <button type="button" id="next-step-2" class="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
-            Next Step
+            {t.booking.nextStep}
           </button>
         </div>
       </div>
 
       <div id="step-3" class="step-content hidden" data-step="3">
-        <h3 class="text-2xl font-bold text-white mb-2">Pet Information</h3>
-        <p class="text-gray-400 mb-6">Tell us about your furry friend</p>
+        <h3 class="text-2xl font-bold text-white mb-2">{t.booking.step3}</h3>
+        <p class="text-gray-400 mb-6">{t.booking.step3Desc}</p>
         <div id="pet-selection-section">
-          <label class="block text-sm text-gray-300 mb-2">Select Pet</label>
+          <label class="block text-sm text-gray-300 mb-2">{t.booking.pet}</label>
           <select id="pet-select" name="existing_pet" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none">
-            <option value="">-- Add New Pet --</option>
+            <option value="">{t.booking.addNewPet}</option>
           </select>
         </div>
         <div id="new-pet-section" class="mt-4 space-y-4 hidden">
           <div>
-            <label class="block text-sm text-gray-300 mb-2">Pet Name</label>
+            <label class="block text-sm text-gray-300 mb-2">{t.booking.petName}</label>
             <input type="text" id="pet-name" name="pet_name" placeholder="e.g. Max" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white placeholder-gray-500 focus:border-accent focus:outline-none" />
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm text-gray-300 mb-2">Type</label>
+              <label class="block text-sm text-gray-300 mb-2">{t.booking.petType}</label>
               <select id="pet-type" name="pet_type" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none">
-                <option value="dog">Dog</option>
-                <option value="cat">Cat</option>
-                <option value="bird">Bird</option>
-                <option value="other">Other</option>
+                <option value="dog">{t.booking.dog}</option>
+                <option value="cat">{t.booking.cat}</option>
+                <option value="bird">{t.booking.bird}</option>
+                <option value="other">{t.booking.other}</option>
               </select>
             </div>
             <div>
-              <label class="block text-sm text-gray-300 mb-2">Size</label>
+              <label class="block text-sm text-gray-300 mb-2">{t.booking.petSize}</label>
               <select id="pet-size" name="pet_size" class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white focus:border-accent focus:outline-none">
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
+                <option value="small">{t.booking.small}</option>
+                <option value="medium">{t.booking.medium}</option>
+                <option value="large">{t.booking.large}</option>
               </select>
             </div>
           </div>
         </div>
         <div class="mt-4">
-          <label class="block text-sm text-gray-300 mb-2">Notes / Special Instructions</label>
-          <textarea id="pet-notes" name="notes" rows="3" placeholder="Any special needs, behavior notes, or care instructions..." class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white placeholder-gray-500 focus:border-accent focus:outline-none resize-none"></textarea>
+          <label class="block text-sm text-gray-300 mb-2">{t.booking.notes}</label>
+          <textarea id="pet-notes" name="notes" rows="3" placeholder={t.booking.notesPlaceholder} class="w-full px-4 py-3 rounded-lg bg-dark-200 border border-dark-200 text-white placeholder-gray-500 focus:border-accent focus:outline-none resize-none"></textarea>
         </div>
         <div class="mt-4">
           <label class="block text-sm text-gray-300 mb-2">Number of Pets <span class="text-gray-500">(for combo discount)</span></label>
@@ -155,17 +164,17 @@ const serviceList = services.slice(0, 6)
         </div>
         <div class="mt-6 flex justify-between">
           <button type="button" class="back-btn px-6 py-3 bg-dark-200 text-white rounded-lg font-semibold hover:bg-dark-100 transition-colors" data-goto="2">
-            Back
+            {t.booking.back}
           </button>
           <button type="button" id="next-step-3" class="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
-            Next Step
+            {t.booking.nextStep}
           </button>
         </div>
       </div>
 
       <div id="step-4" class="step-content hidden" data-step="4">
-        <h3 class="text-2xl font-bold text-white mb-2">Confirm Booking</h3>
-        <p class="text-gray-400 mb-6">Review your booking details</p>
+        <h3 class="text-2xl font-bold text-white mb-2">{t.booking.step4}</h3>
+        <p class="text-gray-400 mb-6">{t.booking.step4Desc}</p>
         <div class="bg-dark-200 rounded-xl p-6 space-y-4">
           <div class="flex items-start gap-4">
             <img id="confirm-service-image" src="" alt="" class="w-20 h-20 object-cover rounded-lg" />
@@ -176,35 +185,35 @@ const serviceList = services.slice(0, 6)
           </div>
           <div class="border-t border-dark-100 pt-4">
             <div class="flex justify-between">
-              <span class="text-gray-400">Start Date:</span>
+              <span class="text-gray-400" data-start-date-label>{t.booking.startDate}:</span>
               <span id="confirm-start-date" class="text-white">-</span>
             </div>
             <div class="flex justify-between mt-2">
-              <span class="text-gray-400">End Date:</span>
+              <span class="text-gray-400" data-end-date-label>{t.booking.endDate}:</span>
               <span id="confirm-end-date" class="text-white">-</span>
             </div>
             <div class="flex justify-between mt-2">
-              <span class="text-gray-400">Duration:</span>
+              <span class="text-gray-400" data-duration-label>{t.booking.duration}:</span>
               <span id="confirm-duration" class="text-white">-</span>
             </div>
           </div>
           <div class="border-t border-dark-100 pt-4">
             <div class="flex justify-between">
-              <span class="text-gray-400">Pet:</span>
+              <span class="text-gray-400" data-pet-label>{t.booking.pet}:</span>
               <span id="confirm-pet-name" class="text-white">-</span>
             </div>
             <div class="flex justify-between mt-2">
-              <span class="text-gray-400">Pet Type/Size:</span>
+              <span class="text-gray-400" data-pet-type-size-label>{t.booking.petTypeSize}:</span>
               <span id="confirm-pet-info" class="text-white">-</span>
             </div>
           </div>
           <div class="border-t border-dark-100 pt-4">
             <div class="flex justify-between items-center">
-              <span class="text-lg font-bold text-white">Total Price:</span>
+              <span class="text-lg font-bold text-white" data-total-price-label>{t.booking.totalPrice}:</span>
               <span id="confirm-total-price" class="text-2xl font-bold text-accent">Q.0</span>
             </div>
             <div id="confirm-discount-row" class="flex justify-between items-center mt-2 hidden">
-              <span class="text-sm text-gray-400">Discount:</span>
+              <span class="text-sm text-gray-400">{t.pricing.discountApplied}:</span>
               <span id="confirm-discount" class="text-sm font-semibold text-green-400">-</span>
             </div>
           </div>
@@ -212,10 +221,10 @@ const serviceList = services.slice(0, 6)
         <div id="error-message" class="mt-4 p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-400 hidden"></div>
         <div class="mt-6 flex justify-between">
           <button type="button" class="back-btn px-6 py-3 bg-dark-200 text-white rounded-lg font-semibold hover:bg-dark-100 transition-colors" data-goto="3">
-            Back
+            {t.booking.back}
           </button>
           <button type="submit" id="submit-booking" class="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
-            Confirm Booking
+            {t.booking.submit}
           </button>
         </div>
       </div>
@@ -227,15 +236,15 @@ const serviceList = services.slice(0, 6)
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-white mb-2">Booking Confirmed!</h3>
-          <p class="text-gray-400 mb-6">Your booking has been successfully created.</p>
+          <h3 class="text-2xl font-bold text-white mb-2">{t.booking.success}</h3>
+          <p class="text-gray-400 mb-6">{t.booking.successDesc}</p>
           <div class="bg-dark-200 rounded-xl p-6 inline-block">
-            <p class="text-sm text-gray-400 mb-1">Booking Reference</p>
+            <p class="text-sm text-gray-400 mb-1">{t.booking.bookingRef}</p>
             <p id="booking-reference" class="text-xl font-bold text-accent">-</p>
           </div>
           <div class="mt-8">
-            <a id="view-bookings-link" href="/es/dashboard" class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
-              View My Bookings
+            <a id="view-bookings-link" href={`/${locale}/dashboard`} class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors">
+              {t.booking.viewBookings}
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -259,14 +268,23 @@ interface ServiceData {
   image: string
 }
 
-const serviceList: ServiceData[] = [
-  { name: 'Pet Sitting', description: '¡Hogar, dulce hogar!', price: 'Q.125 /noche', image: 'https://images.unsplash.com/photo-1609103566358-ccab56549f8d?w=600&h=400&fit=crop' },
-  { name: 'Daycare', description: '¡Sal de casa sin preocupaciones!', price: 'Q.35 /día', image: 'https://images.unsplash.com/photo-1622050163882-6cdf82e5b4c2?w=600&h=400&fit=crop' },
-  { name: 'Homestay', description: '¡Olvídate de las perreras y las jaulas!', price: 'Q.95 /día', image: 'https://images.unsplash.com/photo-1602027439122-724dff5d9bc7?w=600&h=400&fit=crop' },
-  { name: 'Dog Walks', description: '¡Paseos divertidos y seguros!', price: 'Q.45 /hora', image: 'https://images.unsplash.com/photo-1530700131180-d43d9b8cc41f?w=600&h=400&fit=crop' },
-  { name: 'Home Visits', description: '¡Dosis de amor a domicilio!', price: 'Q.45 /hora', image: 'https://images.unsplash.com/photo-1769922927790-b7ac9f316191?w=600&h=400&fit=crop' },
-  { name: 'Photography', description: 'Uno... Dos... ¡Guau!', price: 'Q.350 /sesión', image: 'https://images.unsplash.com/photo-1761035912545-1ec51bbad426?w=600&h=400&fit=crop' },
-]
+// Read service data from the rendered DOM instead of hardcoding
+function getServiceListFromDOM(): ServiceData[] {
+  return Array.from(document.querySelectorAll('.service-card')).map((card) => {
+    const img = card.querySelector('img')
+    const name = card.querySelector('h4')?.textContent?.trim() || ''
+    const description = card.querySelector('p.text-sm')?.textContent?.trim() || ''
+    const price = card.querySelector('p.text-accent')?.textContent?.trim() || ''
+    return {
+      name,
+      description,
+      price,
+      image: img?.getAttribute('src') || '',
+    }
+  })
+}
+
+let serviceList: ServiceData[] = []
 
 interface BookingState {
   currentStep: number
@@ -298,8 +316,13 @@ const state: BookingState = {
   petCount: 1,
 }
 
-const formContainer = document.querySelector('.booking-form-container') as HTMLElement
+const formContainer = document.getElementById('booking-form-container') as HTMLElement
 const steps = [1, 2, 3, 4, 5]
+
+const tPleaseSelectDate = formContainer.dataset.pleaseSelectDate || 'Por favor selecciona una fecha de inicio'
+const tPleaseEnterPetName = formContainer.dataset.pleaseEnterPetName || 'Por favor ingresa el nombre de tu mascota'
+const tPleaseSignIn = formContainer.dataset.pleaseSignIn || 'Por favor inicia sesión para hacer una reserva'
+const tBookingError = formContainer.dataset.bookingError || 'Error al crear la reserva. Inténtalo de nuevo.'
 
 function updateProgress() {
   steps.forEach((step) => {
@@ -430,6 +453,7 @@ function loadUserPets() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  serviceList = getServiceListFromDOM()
   loadUserPets()
 
   const minDate = new Date().toISOString().split('T')[0]
@@ -450,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const endDate = (document.getElementById('end-date') as HTMLInputElement).value
 
     if (!startDate) {
-      alert('Please select a start date')
+      alert(tPleaseSelectDate)
       return
     }
 
@@ -506,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const petSize = (document.getElementById('pet-size') as HTMLSelectElement).value
 
       if (!petName.trim()) {
-        alert('Please enter your pet name')
+        alert(tPleaseEnterPetName)
         return
       }
 
@@ -589,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        alert('Please sign in to make a booking')
+        alert(tPleaseSignIn)
         const locale = window.location.pathname.split('/')[1] || 'es'
         window.location.href = `/${locale}/login`
         return
@@ -703,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error: any) {
       console.error('Booking error:', error)
       if (errorEl) {
-        errorEl.textContent = error.message || 'Failed to create booking. Please try again.'
+        errorEl.textContent = error.message || tBookingError
         errorEl.classList.remove('hidden')
       }
     }

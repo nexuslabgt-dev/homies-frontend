@@ -1,5 +1,6 @@
 ---
 import type { BlogPost } from '@/data/blog';
+import { getTranslations } from '@/i18n';
 
 interface Props {
   post: BlogPost;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const { post, locale } = Astro.props;
+const t = getTranslations(locale as 'es' | 'en');
 
 const formattedDate = new Date(post.date).toLocaleDateString(locale === 'en' ? 'en-US' : 'es-ES', {
   year: 'numeric',
@@ -42,7 +44,7 @@ const blogUrl = `/${locale}/blog/${post.slug}`;
         {post.excerpt}
       </p>
       <div class="mt-4 flex items-center gap-2 font-medium text-primary-600 dark:text-primary-400">
-        <span>Leer más</span>
+        <span>{t.blog.readMore}</span>
         <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>

@@ -1,4 +1,6 @@
 ---
+import { getTranslations } from '@/i18n';
+
 interface Props {
   videoUrl: string;
   author: string;
@@ -7,6 +9,9 @@ interface Props {
 }
 
 const { videoUrl, author, pet, poster } = Astro.props;
+
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 
 const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
 const isVimeo = videoUrl.includes('vimeo.com');
@@ -57,7 +62,7 @@ if (isVimeo) {
               rel="noopener noreferrer"
               href={videoUrl}
             >
-              View on TikTok
+              {t.videoTestimonial.viewOnTikTok}
             </a>
           </section>
         </blockquote>

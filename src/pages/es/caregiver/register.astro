@@ -3,10 +3,11 @@ import Base from '@/layouts/Base.astro';
 import { supabase } from '@/lib/supabase';
 import { getTranslations } from '@/i18n';
 
-const t = getTranslations(Astro.currentLocale || 'es');
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 
 const { data: { session } } = await supabase.auth.getSession();
-if (!session) return Astro.redirect('/es/login');
+if (!session) return Astro.redirect(`/${locale}/login`);
 
 const { data: existingCaregiver } = await supabase
   .from('caregivers')
@@ -14,7 +15,7 @@ const { data: existingCaregiver } = await supabase
   .eq('user_id', session.user.id)
   .single();
 
-if (existingCaregiver) return Astro.redirect('/es/caregiver/dashboard');
+if (existingCaregiver) return Astro.redirect(`/${locale}/caregiver/dashboard`);
 
 const { data: services } = await supabase
   .from('services')

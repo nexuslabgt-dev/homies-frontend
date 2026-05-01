@@ -72,6 +72,9 @@ export const es = {
     subscribe: 'Suscribirme',
     success: '¡Gracias por suscribirte!',
     error: 'Error al suscribirse. Inténtalo de nuevo.',
+    invalidEmail: 'Formato de correo inválido',
+    alreadySubscribed: 'Este correo ya está suscrito',
+    subscribeError: 'Error al suscribirse. Inténtalo de nuevo.',
   },
   footer: {
     hours: 'Horarios',
@@ -433,6 +436,8 @@ export const es = {
     subtitle: 'Conoce a nuestro equipo de cuidadores certificados. Cada Homie está comprometido con el bienestar y seguridad de tu mascota.',
     filterBySpecialty: 'Filtrar por especialidad:',
     all: 'Todos',
+    contact: 'Contactar',
+    defaultRole: 'Cuidador',
   },
   contact: {
     title: 'Contáctanos',
@@ -475,6 +480,9 @@ export const es = {
     bookNow: 'Reservar ahora',
     priceNote: 'Nota: Los precios pueden variar según el tamaño de la mascota, condición del pelaje y requisitos específicos. Contáctanos para una cotización personalizada.',
     getQuote: 'Obtener cotización',
+    emailLabel: 'Correo electrónico',
+    phoneLabel: 'Teléfono',
+    hoursLabel: 'Horarios',
   },
   teamPage: {
     title: 'Nuestro Equipo',
@@ -494,6 +502,10 @@ export const es = {
     pageTitle: 'Blog de Tips',
     seeAll: 'Ver todas las publicaciones',
     back: 'Volver al blog',
+    readMore: 'Leer más',
+  },
+  videoTestimonial: {
+    viewOnTikTok: 'Ver en TikTok',
   },
   beforeAfter: {
     heading: 'Antes y Después',
