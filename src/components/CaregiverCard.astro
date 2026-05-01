@@ -1,5 +1,6 @@
 ---
 import type { Caregiver, Profile } from '../lib/types';
+import { getTranslations } from '@/i18n';
 
 interface CaregiverWithProfile extends Caregiver {
   profiles?: Profile | null;
@@ -10,8 +11,10 @@ interface Props {
 }
 
 const { caregiver } = Astro.props;
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 
-const fullName = caregiver.profiles?.full_name || 'Unknown';
+const fullName = caregiver.profiles?.full_name || t.common.unknown;
 const avatarUrl = caregiver.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=1e293b&color=e2e8f0&size=128`;
 const rating = caregiver.average_rating || 0;
 const specialties = caregiver.specialties || [];
@@ -47,7 +50,7 @@ const availability = typeof caregiver.availability === 'object' && caregiver.ava
         )}
       </div>
       <p class="text-gray-400 text-sm">
-        {serviceTypes.length > 0 ? serviceTypes.join(' · ') : 'Cuidador'}
+        {serviceTypes.length > 0 ? serviceTypes.join(' · ') : t.caregivers.defaultRole}
       </p>
 
       {hourlyRate && (
@@ -86,9 +89,9 @@ const availability = typeof caregiver.availability === 'object' && caregiver.ava
   )}
 
   <a
-    href="/messages"
+    href={`/${locale}/messages`}
     class="block w-full py-3 bg-primary hover:bg-primary/90 text-white text-center font-medium rounded-xl transition-colors"
   >
-    Contactar
+    {t.caregivers.contact}
   </a>
 </article>

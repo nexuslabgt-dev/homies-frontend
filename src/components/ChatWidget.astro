@@ -82,7 +82,7 @@ const SUPABASE_URL = import.meta.env.SUPABASE_URL
         </svg>
       </div>
       <p class="text-gray-300 mb-4">{t.chat.loginPrompt}</p>
-      <a href="/login" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+      <a href={`/${locale}/login`} class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
         {t.chat.login}
       </a>
     </div>

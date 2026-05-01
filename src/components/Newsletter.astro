@@ -5,7 +5,11 @@ const locale = Astro.currentLocale || 'es';
 const t = getTranslations(locale);
 ---
 
-<div class="bg-gradient-to-r from-primary-600 to-primary-700 py-12">
+<div id="newsletter-container" class="bg-gradient-to-r from-primary-600 to-primary-700 py-12"
+  data-invalid-email={t.newsletter.invalidEmail}
+  data-already-subscribed={t.newsletter.alreadySubscribed}
+  data-subscribe-error={t.newsletter.subscribeError}
+>
   <div class="container mx-auto px-4">
     <div class="mx-auto max-w-xl text-center" data-animate>
       <div class="mb-4 flex justify-center">
@@ -62,9 +66,14 @@ const t = getTranslations(locale);
 <script>
   import { supabase } from '../lib/supabase'
 
+  const container = document.getElementById('newsletter-container');
   const form = document.getElementById('newsletter-form') as HTMLFormElement;
   const successEl = document.getElementById('newsletter-success');
   const errorEl = document.getElementById('newsletter-error');
+
+  const tInvalidEmail = container?.dataset.invalidEmail || 'Invalid email format';
+  const tAlreadySubscribed = container?.dataset.alreadySubscribed || 'Email already subscribed';
+  const tSubscribeError = container?.dataset.subscribeError || 'Failed to subscribe. Please try again.';
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -77,7 +86,7 @@ const t = getTranslations(locale);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       if (errorEl) {
-        errorEl.textContent = 'Invalid email format';
+        errorEl.textContent = tInvalidEmail;
         errorEl.classList.remove('hidden');
       }
       return;
@@ -90,7 +99,7 @@ const t = getTranslations(locale);
 
       if (error) {
         if (error.code === '23505') {
-          throw new Error('Email already subscribed');
+          throw new Error(tAlreadySubscribed);
         }
         throw error;
       }
@@ -99,7 +108,7 @@ const t = getTranslations(locale);
       successEl?.classList.remove('hidden');
     } catch (err: any) {
       if (errorEl) {
-        errorEl.textContent = err.message || 'Failed to subscribe. Please try again.';
+        errorEl.textContent = err.message || tSubscribeError;
         errorEl.classList.remove('hidden');
       }
     }

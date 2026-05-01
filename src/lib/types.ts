@@ -6,8 +6,6 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type PetType = 'dog' | 'cat' | 'bird' | 'other'
-export type PetSize = 'small' | 'medium' | 'large'
 export type BookingStatus = 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'
 
 export interface Profile {
@@ -99,8 +97,8 @@ export interface Message {
 export interface NewsletterSubscriber {
   id: string
   email: string
-  subscribed_at: string
   is_active: boolean
+  subscribed_at: string
 }
 
 export interface Database {

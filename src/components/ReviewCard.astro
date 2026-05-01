@@ -10,6 +10,7 @@ interface Props {
 }
 
 const { review } = Astro.props;
+const locale = Astro.currentLocale || 'es';
 
 const authorName = review.profiles?.full_name || 'Usuario anónimo';
 const authorAvatar = review.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=1e293b&color=e2e8f0&size=128`;
@@ -17,7 +18,7 @@ const rating = review.rating || 0;
 const comment = review.comment || '';
 const createdAt = new Date(review.created_at);
 
-const formattedDate = createdAt.toLocaleDateString('es-ES', {
+const formattedDate = createdAt.toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric'

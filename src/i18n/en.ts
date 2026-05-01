@@ -72,6 +72,9 @@ export const en = {
     subscribe: 'Subscribe',
     success: 'Thanks for subscribing!',
     error: 'Failed to subscribe. Please try again.',
+    invalidEmail: 'Invalid email format',
+    alreadySubscribed: 'Email already subscribed',
+    subscribeError: 'Failed to subscribe. Please try again.',
   },
   footer: {
     hours: 'Hours',
@@ -394,6 +397,8 @@ export const en = {
     subtitle: 'Meet our team of certified caregivers. Each Homie is committed to the well-being and safety of your pet.',
     filterBySpecialty: 'Filter by specialty:',
     all: 'All',
+    contact: 'Contact',
+    defaultRole: 'Caregiver',
   },
   contact: {
     title: 'Get in Touch',
@@ -436,6 +441,9 @@ export const en = {
     bookNow: 'Book Now',
     priceNote: 'Note: Prices may vary based on pet size, coat condition, and specific requirements. Contact us for a personalized quote.',
     getQuote: 'Get a Quote',
+    emailLabel: 'Email',
+    phoneLabel: 'Phone',
+    hoursLabel: 'Hours',
   },
   teamPage: {
     title: 'Our Team',
@@ -455,6 +463,10 @@ export const en = {
     pageTitle: 'Tips Blog',
     seeAll: 'View all posts',
     back: 'Back to blog',
+    readMore: 'Read more',
+  },
+  videoTestimonial: {
+    viewOnTikTok: 'View on TikTok',
   },
   beforeAfter: {
     heading: 'Before & After',

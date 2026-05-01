@@ -1,4 +1,6 @@
 ---
+import { getTranslations } from '@/i18n';
+
 interface Props {
   bookingId: string;
   caregiverId: string;
@@ -6,10 +8,18 @@ interface Props {
 }
 
 const { bookingId, caregiverId, userId } = Astro.props;
+const locale = Astro.currentLocale || 'es';
+const t = getTranslations(locale);
 ---
 
-<form id="review-form" data-booking-id={bookingId} data-caregiver-id={caregiverId} data-user-id={userId} class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-  <h3 class="text-lg font-semibold text-white mb-4">Deja tu reseña</h3>
+<form id="review-form" data-booking-id={bookingId} data-caregiver-id={caregiverId} data-user-id={userId}
+  data-select-rating={t.reviews.rating}
+  data-submitting={t.reviews.submitting}
+  data-error-default={t.reviews.error}
+  data-thank-you={t.reviews.thankYou}
+  data-thank-you-desc={t.reviews.thankYouDesc}
+  class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+  <h3 class="text-lg font-semibold text-white mb-4">{t.reviews.leaveReview}</h3>
 
   <div id="review-error" class="hidden bg-red-900/30 border border-red-700 rounded-lg p-3 mb-4 text-red-400 text-sm"></div>
   
@@ -17,13 +27,13 @@ const { bookingId, caregiverId, userId } = Astro.props;
     <svg class="w-12 h-12 text-green-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
-    <h3 class="text-xl font-semibold text-white mb-2">Gracias por tu reseña!</h3>
-    <p class="text-gray-400">Tu opinion ayuda a otros usuarios a elegir al mejor cuidador.</p>
+    <h3 class="text-xl font-semibold text-white mb-2">{t.reviews.thankYou}</h3>
+    <p class="text-gray-400">{t.reviews.thankYouDesc}</p>
   </div>
 
   <div id="review-fields">
     <div class="mb-4">
-      <label class="block text-gray-300 text-sm font-medium mb-2">Calificacion</label>
+      <label class="block text-gray-300 text-sm font-medium mb-2">{t.reviews.rating}</label>
       <div class="flex gap-2" id="star-rating">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -40,12 +50,12 @@ const { bookingId, caregiverId, userId } = Astro.props;
     </div>
 
     <div class="mb-4">
-      <label for="comment" class="block text-gray-300 text-sm font-medium mb-2">Comentario</label>
+      <label for="comment" class="block text-gray-300 text-sm font-medium mb-2">{t.reviews.comment}</label>
       <textarea
         id="comment"
         rows="4"
         class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-        placeholder="Cuentanos tu experiencia con este cuidador..."
+        placeholder={t.reviews.commentPlaceholder}
         required
       ></textarea>
     </div>
@@ -55,7 +65,7 @@ const { bookingId, caregiverId, userId } = Astro.props;
       id="submit-review"
       class="w-full py-3 bg-primary hover:bg-primary/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors"
     >
-      Enviar Resena
+      {t.reviews.submit}
     </button>
   </div>
 </form>
@@ -67,6 +77,12 @@ const { bookingId, caregiverId, userId } = Astro.props;
   const bookingId = form.dataset.bookingId!;
   const caregiverId = form.dataset.caregiverId!;
   const userId = form.dataset.userId!;
+  
+  const tSelectRating = form.dataset.selectRating || 'Por favor selecciona una calificación.';
+  const tSubmitting = form.dataset.submitting || 'Enviando...';
+  const tErrorDefault = form.dataset.errorDefault || 'Error al enviar la reseña.';
+  const tThankYou = form.dataset.thankYou || 'Gracias por tu reseña!';
+  const tThankYouDesc = form.dataset.thankYouDesc || 'Tu opinión ayuda a otros usuarios a elegir al mejor cuidador.';
   
   let currentRating = 0;
 
@@ -94,13 +110,13 @@ const { bookingId, caregiverId, userId } = Astro.props;
     const fieldsEl = document.getElementById('review-fields') as HTMLDivElement;
 
     if (currentRating === 0) {
-      errorEl.textContent = 'Por favor selecciona una calificacion.';
+      errorEl.textContent = tSelectRating;
       errorEl.classList.remove('hidden');
       return;
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Enviando...';
+    submitBtn.textContent = tSubmitting;
     errorEl.classList.add('hidden');
 
     try {
@@ -117,7 +133,7 @@ const { bookingId, caregiverId, userId } = Astro.props;
       fieldsEl.classList.add('hidden');
       successEl.classList.remove('hidden');
     } catch (err: any) {
-      errorEl.textContent = err.message || 'Error al enviar la resena.';
+      errorEl.textContent = err.message || tErrorDefault;
       errorEl.classList.remove('hidden');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Enviar Resena';
